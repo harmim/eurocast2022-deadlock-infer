@@ -1,0 +1,136 @@
+@InCollection{hvc:2013:dias,
+  title =        "Precise Detection of Atomicity Violations",
+  author =       "Dias, Ricardo J. and Pessanha, Vasco and Lourenço, João M.",
+  booktitle =    "Hardware and Software: Verification and Testing",
+  publisher =    "Springer Berlin / Heidelberg",
+  series =       "Lecture Notes in Computer Science",
+  ISSN =         "0302-9743",
+  year =         "2013",
+  volume =       "7857",
+  editor={Biere, Armin and Nahir, Amir and Vos, Tanja},
+  doi={10.1007/978-3-642-39611-3_8},
+  url={http://dx.doi.org/10.1007/978-3-642-39611-3_8},
+  pages={8-23},
+  month =    nov,
+  isbn=      "978-3-642-39610-6",
+  note =         "HVC 2012 Best Paper Award",
+  keywords =     "selected_and_recent",
+  abstract =     "Concurrent programs that are free of unsynchronized accesses to shared data may still exhibit unpredictable concurrency errors called atomicity violations, which include both high-level dataraces and stale-value errors. Atomicity violations occur when programmers make wrong assumptions about the atomicity scope of a code block, incorrectly splitting it in two or more atomic blocks and allow them to be interleaved with other atomic blocks. In this paper we propose a novel static analysis algorithm that works on a dependency graph of program variables and detects both high-level dataraces and stale-value errors. The algorithm was implemented for a Java Bytecode analyzer and its effectiveness was evaluated with some well known faulty programs. The results obtained show that our algorithm performs better than previous approaches, achieving higher precision for small and medium sized programs, making it a good basis for a practical tool.",
+}
+
+@TECHREPORT{tr:2014:d_sousa,
+  AUTHOR =        {Diogo G. Sousa and Ricardo J. Dias and Carla Ferreira and João M. Lourenço},
+  TITLE =         {Preventing Atomicity Violations with Contracts},
+  NUMBER =        {UNL-DI-xx},
+  INSTITUTION =   {Departamento de Informática, Universidade NOVA de Lisboa},
+  ADDRESS =       {Portugal},
+  ABSTRACT =      {Software developers are expected to synchronize concurrent accesses to shared regions of memory with some mutual exclusion primitive that ensures atomicity properties to a sequence of program statements. This approach prevents data races but may fail to provide all necessary correctness properties, potentially leaving atomicity violations unaddressed. The composition of atomic operations may cause these atomicity violations if there is a correlation between them. To avoid this the operations should be grouped in a larger atomic scope to ensure their correct execution. This problem is especially common when using services provided by third party packages or modules, since the programmer may fail to identify which services are correlated. Developers of a module can specifying a contract that identifies which methods are correlated and must be executed in the same atomic scope, reducing the program errors due to atomicity violations. If a contract is complete and the program respects it then the program is safe from atomicity violations with respect to the contract’s module. This work presents a static analysis based methodology to verify such contracts.},
+  KEYWORDS =      {},
+  NOTE =          {},
+  MONTH =         dec,
+  YEAR  =         {2014},
+  CONTACT =       {joao.lourenco@fct.unl.pt}
+}
+
+
+@ARTICLE{noise14,
+   author = {Jan Fiedor and Vendula Hrub\'{a} and Bohuslav K\v{r}ena and 
+Zden\v{e}k Letko and Shmuel Ur and Tom\'{a}\v{s} Vojnar},
+   title = {Advances in Noise-based Testing},
+   pages = {1--38},
+   journal = {STVR},
+   volume = {24},
+   number = {7},
+   year = {2014},
+   ISSN = {1099-1689},
+   publisher={Willey}
+}
+
+
+@inproceedings{atomsetser08,
+ author = {Hammer, Christian and Dolby, Julian and Vaziri, Mandana and Tip,
+Frank},
+ title = "{Dynamic Detection of Atomic-set-serializability Violations}",
+ booktitle = {Proc. of ICSE'08},
+ year = {2008},
+ publisher = {ACM}
+ }
+ 
+ @inproceedings{avio06,
+ author = {Shan Lu and Joseph Tucek and Feng Qin and Yuanyuan Zhou},
+ title = "{AVIO: Detecting Atomicity Violations via Access Interleaving
+Invariants}",
+ booktitle = {Proc. of ASPLOS'06},
+ year = {2006},
+ publisher = {ACM}
+ }
+ 
+ @inproceedings{contract13,
+  author    = {Demeyer, Romain and Vanhoof, Wim},
+  year      = {2013},
+  title     = "{Static Application-Level Race Detection in STM Haskell using 
+Contracts}",
+  booktitle = {Proc. of PLACCES},
+  publisher = {Open Publishing Association},
+}
+
+@inproceedings{goldilocks07,
+ author = {Tayfun Elmas and Shaz Qadeer and Serdar Tasiran},
+ title = "{Goldilocks: A Race and Transaction-aware Java Runtime}",
+ booktitle = {Proc. of PLDI'07},
+ year = {2007},
+ publisher = {ACM}
+ }
+ 
+@article{velodrome08,
+ author = {Flanagan, Cormac and Freund, Stephen N. and Yi, Jaeheon},
+ title = "{Velodrome: A Sound and Complete Dynamic Atomicity Checker for
+Multithreaded Programs}",
+ journal = {SIGPLAN Not.},
+ volume = {43},
+ number = {6},
+ year = {2008},
+ issn = {0362-1340},
+ publisher = {ACM}
+ }
+ 
+ 
+ 
+ @inproceedings{Hurlin09,
+ author = {Hurlin, Cl{\'e}ment},
+ title = {Specifying and Checking Protocols of Multithreaded Classes},
+ booktitle = {Proc. of SAC'09},
+ year = {2009},
+ pages = {587--592},
+ numpages = {6},
+ publisher = {ACM},
+}
+
+@article{contracts92,
+ author = {Meyer, Bertrand},
+ title = "{Applying \"Design by Contract\"}",
+ journal = {Computer},
+ volume = {25},
+ number = {10},
+ month = oct,
+ year = {1992},
+ issn = {0018-9162},
+ pages = {40--51},
+ numpages = {12},
+ publisher = {IEEE Computer Society Press}
+} 
+
+@article{Cheon07,
+ author = {Cheon, Yoonsik and Perumandla, Ashaveena},
+ title = "{Specifying and Checking Method Call Sequences of Java Programs}",
+ journal = {Software Quality Control},
+ issue_date = {March     2007},
+ volume = {15},
+ number = {1},
+ month = mar,
+ year = {2007},
+ issn = {0963-9314},
+ pages = {7--25},
+ numpages = {19},
+ publisher = {Kluwer Academic Publishers},
+} 

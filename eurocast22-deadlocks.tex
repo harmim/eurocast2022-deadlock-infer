@@ -1,0 +1,253 @@
+% -----------------------------------------------------------------------------
+% Eurocast 2014 extended abstract TeX file.
+% -----------------------------------------------------------------------------
+
+\documentclass[runningheads]{llncs}
+
+% Packages
+\usepackage{pbox}
+\usepackage{times}
+\usepackage{color}
+
+% Page style
+\pagestyle{plain}
+
+% Section counter (number subsubsections)
+\setcounter{tocdepth}{3}
+
+% Useful commands (todo, remark, ...)
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
+\newcommand{\rem}[1]{\textcolor{blue}{[NOTE: #1]}}
+\newcommand{\fixme}[1]{\textcolor{red}{[FIXME: #1]}}
+
+% -----------------------------------------------------------------------------
+% Document content
+% -----------------------------------------------------------------------------
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% LLNCS typesetting
+% -----------------------------------------------------------------------------
+
+\mainmatter
+
+\newcommand{\thetitle}{Dynamic Validation of Contracts in Concurrent Code}
+
+\title{\thetitle\vspace*{-3mm}}
+
+\titlerunning{\thetitle}
+
+\author{
+  Jan Fiedor\inst{1} \and
+  Zden\v{e}k Letko\inst{1} \and
+  Jo\~{a}o Louren\c{c}o\inst{2} \and
+  Tom\'{a}\v{s} Vojnar\inst{1}
+}
+
+\institute{
+  IT4Innovations Centre of Excellence,
+  FIT, Brno University of Technology, Czech Republic
+  %% \\
+  %% \email{\{ifiedor, iletko, vojnar\}@fit.vutbr.cz}
+  \and
+  CITI / NOVA LINCS, FCT -- Universidade Nova de Lisboa, Portugal
+  %% \\
+  %% \email{joao.lourenco@fct.unl.pt}
+}
+
+\maketitle
+
+% -----------------------------------------------------------------------------
+\vspace*{-4mm}\section{Introduction}\vspace*{-1.5mm}
+% -----------------------------------------------------------------------------
+
+With multi-core processors present in every newer computer, multi-threaded
+programs are becoming increasingly common.
+%
+However, multi-threaded programs require proper synchronisation to restrict the
+thread interleavings and make the program produce correct results.
+%
+Failing to do so often leads to various critical errors, which occur under some
+very specific timing scenarios only, and hence standard testing and debugging
+techniques are less effective or even useless for detecting them.
+
+
+\emph{Atomicity violations} are a class of errors which result from an incorrect
+definition of the scope of an atomic region.
+%
+Such errors are usually hard to localize and diagnose, which becomes even harder
+when using a (third-party) software library where it is unknown to the
+programmer how to form the atomic regions correctly when accessing the library.
+%
+Even new synchronisation techniques, such as transactional memories, designed to
+ease the process of writing concurrent programs, do not entirely avoid this
+problem as transactional memory programs may suffer from atomicity violations as
+well~\cite{hvc:2013:dias}.
+
+
+One way to address the problem of proper atomicity is to associate a
+\emph{contract} with each program module/library~\cite{contracts92}.
+%
+In general, a contract regulates the use of methods of an object by specifying a
+set of pre-conditions the program must meet before calling the object methods.
+%
+In our context, one can, in particular, use the notion of a \emph{contract for
+concurrency}~\cite{tr:2014:d_sousa}, having the form of a set of terms where
+each term defines a sequence of method calls that must be executed atomically.  
+%
+% If the contract terms are violated, atomicity violations may (but don't have
+% to) occur at runtime. 
+%
+Contract terms may be written by the software module/library developer or
+inferred automatically from the program~\cite{tr:2014:d_sousa}. 
+% 
+% Detecting violations to the contract terms may help avoiding atomicity
+% violations during program execution.
+
+% To detect an atomicity violation, one has to check whether a contract is
+% violated in the execution of a program, i.e., whether there is a sequence of
+% method calls which should be executed atomically, but the atomicity is not
+% enforced during the execution.
+%
+In this paper, assuming that the appropriate contracts for concurrency have been
+obtained, we devise a technique for their dynamic validation at program run
+time.
+
+% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{6mm}
+% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+% -----------------------------------------------------------------------------
+\vspace*{-2.5mm}\section{Dynamic Validation of Contracts}\vspace*{-1.5mm}
+% -----------------------------------------------------------------------------
+
+In~\cite{contract13,tr:2014:d_sousa}, a static approach to contract validation
+has been proposed. This approach can prove that a contract can never be
+violated. However, in practice, it scales to relatively small programs only. For
+more complex programs, one has to restrict the analysis to program fragments,
+e.g., individual methods, in order to achieve reasonable performance. This
+restriction leads to a loss of precision and to false alarms as the analysis
+does not know whether a sequence of method calls may be interleaved with method
+calls from other threads at all. Thus, a~contract violation might be reported
+even when a~sequence of method calls needs not be executed atomically because no
+other thread may interfere with it.  Another problem is that of dealing with
+imprecise information about the objects whose methods are called. Hence, calls
+of methods on different objects are mixed together, again leading to possible
+false alarms.
+
+In order to detect atomicity violations in more complex programs and to reduce
+the number of false alarms, we propose a dynamic approach to check whether a
+contract is violated or not. Our dynamic validation checks whether a contract is
+violated during a concrete execution of a program. Possible violations not seen
+during the witnessed execution of the program are missed, but all of the methods
+encountered during the execution are taken into account, and so contract
+violations caused by method calls from all over the program are detected.
+Because all of the threads are running and all objects are known when the
+program is executing, no false alarms are reported as we know precisely whether
+all of the methods called in a sequence use the same object and which method
+calls might interleave this sequence. 
+
+Since we concentrate on contract violations seen in concrete executions, we can
+avoid false alarms, but on the other hand, we can miss some errors. In order to
+minimize this possibility, we employ dynamic analysis techniques, such as vector
+clocks and lock sets \cite{velodrome08}, in order to extrapolate the actually
+witnessed behaviour and hence detect possible contract violations even when they
+were not actually witnessed.  Moreover, we use a specialised blend of noise
+injection techniques \cite{noise14} to enforce even rare synchronization
+scenarios leading to behaviours (and possibly contract violations) we would not
+cover by using extrapolation of the common synchronization scenarios only.
+
+% -----------------------------------------------------------------------------
+\vspace*{-2mm}\section{Related Work}\vspace*{-1.5mm}
+% -----------------------------------------------------------------------------
+
+The design by contract (DBC) methodology~\cite{contracts92} allows one to
+produce robust code that follows contracts between programs and objects.
+Contracts in the form of regular expressions were used to specify protocols for
+accessing objects in sequential~\cite{Cheon07} as well as concurrent
+scenarios~\cite{Hurlin09,contract13,tr:2014:d_sousa}.
+In~\cite{tr:2014:d_sousa,contract13}, the contracts are validated statically
+which does not scale well. In~\cite{Hurlin09}, a technique to validate
+correctness of contracts by proving contracts on a set of artificially generated
+programs that use particular object is presented. Our approach of combining
+contracts, dynamic analysis, and noise injection techniques scales well and is
+able to validate contracts in real multi-threaded programs.
+
+% -----------------------------------------------------------------------------
+% Acknowledgement
+% -----------------------------------------------------------------------------
+
+% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{5mm}
+% !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+\vspace*{2mm}{\fontsize{8}{8}\selectfont \noindent\emph{Acknowledgement.} The
+work was supported by the ESF COST Action IC1001 (Euro-TM), the COST project
+LD14001 and the Kontakt II project LH13265 of the Czech ministry of education,
+the BUT project FIT-S-14-2486, the EU/Czech IT4Innovations Centre of Excellence
+project CZ.1.05/1.1.00/02.0070, the EU/Czech Interdisciplinary Excellence
+Research Teams Establishment project CZ.1.07/2.3.00/30.0005, 
+%
+and the Portuguese National Science Foundation in the strategic project
+PEst-OE/EEI/UI0527/2014.}\vspace*{-2mm}
+
+% -----------------------------------------------------------------------------
+% Bibliography
+% -----------------------------------------------------------------------------
+
+% \bibliographystyle{abbrv}
+% \bibliography{bibliography}
+
+\begin{thebibliography}{1}
+
+\bibitem{Cheon07}
+Y.~Cheon and A.~Perumandla.
+\newblock {Specifying and Checking Method Call Sequences of Java Programs}.
+\newblock {\em Software Quality Control}, 15(1):7--25, Springer, 2007.
+
+\bibitem{contract13}
+R.~Demeyer and W.~Vanhoof.
+\newblock {Static Application-Level Race Detection in STM Haskell Using
+  Contracts}.
+\newblock In {\em Proc. of PLACCES'13}, Open Publishing Association, 2013.
+
+\bibitem{hvc:2013:dias}
+R.~J. Dias, V.~Pessanha, and J.~M. Lourenço.
+\newblock Precise Detection of Atomicity Violations.
+\newblock In {\em Proc. of HVC'13}, LNCS 7857, Springer, 2013.
+
+\bibitem{noise14}
+J.~Fiedor, V.~Hrub\'{a}, B.~K\v{r}ena, Z.~Letko, S.~Ur, and T.~Vojnar.
+\newblock Advances in noise-based testing.
+\newblock {\em STVR}, 24(7):1--38, Wiley, 2014.
+
+\bibitem{velodrome08}
+C.~Flanagan, S.~N. Freund, and J.~Yi.
+\newblock {Velodrome: A Sound and Complete Dynamic Atomicity Checker for
+  Multithreaded Programs}.
+\newblock {\em SIGPLAN Notices}, 43(6), 2008.
+
+\bibitem{Hurlin09}
+C.~Hurlin.
+\newblock Specifying and Checking Protocols of Multithreaded Classes.
+\newblock In {\em Proc. of SAC'09}, ACM, 2009.
+
+\bibitem{contracts92}
+B.~Meyer.
+\newblock {Applying ``Design by Contract''}.
+\newblock {\em Computer}, 25(10):40--51, 1992.
+
+\bibitem{tr:2014:d_sousa}
+D.~G. Sousa, R.~J. Dias, C.~Ferreira, and J.~M. Lourenço.
+\newblock Preventing Atomicity Violations with Contracts.
+\newblock Technical Report UNL-DI-xx, Universidade NOVA de Lisboa, Portugal, 
+2014.
+
+\end{thebibliography}
+
+\end{document}
+
+% -----------------------------------------------------------------------------
+% End of Eurocast 2014 extended abstract TeX file.
+% -----------------------------------------------------------------------------
