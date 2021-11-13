@@ -6,13 +6,13 @@
 
 % Packages
 \usepackage{pbox}
-%\usepackage{times}
-\usepackage{crimson}
+\usepackage{times}
+%\usepackage{crimson}
 \usepackage{color}
 
 % Page style
-% \pagestyle{plain}
 \pagestyle{plain}
+% \pagestyle{plain}
 
 % Section counter (number subsubsections)
 \setcounter{tocdepth}{3}
@@ -30,7 +30,7 @@
 
 \newcommand{\thetitle}{Static Deadlock Detection in Low-Level C Code}
 
-\title{\thetitle\vspace*{-4mm}}
+\title{\thetitle\vspace*{-4.5mm}}
 
 \titlerunning{\thetitle}
 
@@ -38,7 +38,7 @@
   Dominik Harmim \and
   Vladim\'{\i}r Marcin \and
   Lucie Svobodov\'{a} \and
-  Tom\'{a}\v{s} Vojnar\vspace*{-2mm}
+  Tom\'{a}\v{s} Vojnar\vspace*{-2.5mm}
 }
 
 \institute{
@@ -50,7 +50,7 @@
 \maketitle
 
 %-----------------------------------------------------------------------------
-\vspace*{-4mm}\section{Introduction}\vspace*{-2mm}
+\vspace*{-4.5mm}\section{Introduction}\vspace*{-2.5mm}
 %-----------------------------------------------------------------------------
 
 Nowadays, programs often use \emph{multithreading} to better utilise the many
@@ -88,8 +88,10 @@ expensive too.
 
 On the other hand, approaches based on \emph{model checking}, i.e., exhaustive
 state space exploration, can guarantee discovery of all potentially present
-errors---either in general or at least up to some bound, which is usually given
-in the number of context switches.
+errors.
+%
+% ---either in general or at least up to some bound, which is usually given in
+% the number of context switches.
 %
 The scalability of these techniques is, however, so far not sufficient to handle
 truly large industrial code even when combining it with methods such as
@@ -145,7 +147,7 @@ each function needs to be reanalysed in a new context, which reduces the
 scalability.
 
 %-----------------------------------------------------------------------------
-\vspace*{-3mm}\section{Static Deadlock Detection in Low-Level Concurrent C
+\vspace*{-3.5mm}\section{Static Deadlock Detection in Low-Level Concurrent C
 Code}\vspace*{-2mm}
 %-----------------------------------------------------------------------------
 
@@ -161,11 +163,13 @@ For each analysed function, we derive a \emph{summary} that consists of a
 The summaries are then used when analysing functions higher up in the call
 hierarchy.
 %
-Intuitively, the pre-condition states what states of locks the function expects
-from its callers, and the post-condition reflects the effect of the function on
-the locks.
-
-More precisely, the pre-condition of a function states which locks are
+% Intuitively, the pre-condition states what states of locks the function expects
+% from its callers, and the post-condition reflects the effect of the function on
+% the locks.
+%
+% More precisely, 
+%
+Intuitively, the pre-condition of a function states which locks are
 \emph{expected to be locked or unlocked} upon a call of the function to avoid
 possible double locking or unlocking, respectively.
 %
@@ -222,12 +226,12 @@ Altogether, L2D2 consumed less than 1\,\% of the time taken by Cprover.
 %-----------------------------------------------------------------------------
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-\enlargethispage{5mm}
+\enlargethispage{7mm}
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 \vspace*{2mm}{\fontsize{8}{8}\selectfont \noindent\emph{Acknowledgement.} The
 work was supported by the project No. 20-07487S of the Czech Science
-Foundation.}\vspace*{-2mm}
+Foundation.}\vspace*{-3mm}
 
 %-----------------------------------------------------------------------------
 % Bibliography
@@ -237,7 +241,7 @@ Foundation.}\vspace*{-2mm}
 %\bibliography{bibliography}
 
 \begin{thebibliography}{1}
-\vspace*{-2mm}
+\vspace*{-2.5mm}
 
 \bibitem{racerD18}
 S.~Blackshear, N.~Gorogiannis, P.~O'Hearn, and I.~Sergey.
@@ -246,9 +250,8 @@ S.~Blackshear, N.~Gorogiannis, P.~O'Hearn, and I.~Sergey.
   2(OOPSLA):144:1--144:28, 2018.
 
 \bibitem{inferNFM15}
-C.~Calcagno, D.~Distefano, J.~Dubreil \emph{et al}. 
-% D.~Gabi, P.~Hooimeijer, M.~Luca, P.~O'Hearn, I.~Papakonstantinou, J.~Purbrick, 
-% and D.~Rodriguez.
+C.~Calcagno, D.~Distefano, J.~Dubreil, D.~Gabi, P.~Hooimeijer, M.~Luca,
+P.~O'Hearn, I.~Papakonstantinou, J.~Purbrick, and D.~Rodriguez.
 \newblock {Moving Fast with Software Verification}.
 \newblock In {\em Proc. of NFM'15}, LNCS 9058. Springer, 2015.
 
@@ -280,10 +283,10 @@ D.~Kroening, D.~Poetzl, P.~Schrammel, and B.~Wachter.
 \newblock In {\em Proc. of ASE'16}. ACM, 2016.
 
 \bibitem{lazy-seq-16}
-T.~Nguyen, B.~Fischer, S.~L. Torre, and G.~Parlato.
+T.~Nguyen, B.~Fischer, S.~L. Torre, G.~Parlato.
 \newblock {Lazy Sequentialization for the Safety Verification of Unbounded
   Concurrent Programs}.
-\newblock In {\em Proc. of ATVA'16}, LNCS 9938. Springer, 2016.
+\newblock {\em Proc. of ATVA'16}, LNCS 9938. Springer, 2016.
 
 \bibitem{schedspec12}
 J.~Wu, Y.~Tang, H.~Hu, H.~Cui, and J.~Yang.
