@@ -139,8 +139,8 @@ Our checker is called L2D2 for ``low-level deadlock detector''.
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 Out of existing static deadlock detectors, L2D2 is probably the closest to
-RacerX \cite{racerX03}, and some of the approaches used in L2D2 are inspired by
-RacerX.
+\mbox{RacerX}~\cite{racerX03}, and some of the approaches used in L2D2 are
+inspired by RacerX.
 %
 However, unlike L2D2, RacerX uses a context-sensitive analysis, meaning that
 each function needs to be reanalysed in a new context, which reduces the
@@ -163,9 +163,9 @@ For each analysed function, we derive a \emph{summary} that consists of a
 The summaries are then used when analysing functions higher up in the call
 hierarchy.
 %
-% Intuitively, the pre-condition states what states of locks the function expects
-% from its callers, and the post-condition reflects the effect of the function on
-% the locks.
+% Intuitively, the pre-condition states what states of locks the function
+% expects from its callers, and the post-condition reflects the effect of the
+% function on the locks.
 %
 % More precisely, 
 %
@@ -177,7 +177,7 @@ The post-condition contains information about which locks \emph{may be locked or
 unlocked} at the exit of the function.
 %
 Next, the summary contains so-called \emph{lock dependencies} in the form of
-pair of locks $(l_1,l_2)$ where locking of $l_2$ was seen while $l_1$ was
+pairs of locks $(l_1,l_2)$ where locking of $l_2$ was seen while $l_1$ was
 locked.
 %
 At the end of the analysis, detection of cycles in the lock dependencies is used
@@ -195,9 +195,9 @@ For example, since double-locking/unlocking errors are quite rare, their
 detection may instead be used as an indicator that the analysis is
 over-approximating too much, and it may reset (some of) the working sets.
 %
-An example of another heuristic used is detection of so-called \emph{gate
-locks}, i.e., locks guarding other locks (upon which deadlocks on the nested
-locks are not reported).
+An example of another heuristic used in L2D2 is detection of so-called
+\emph{gate locks}, i.e., locks guarding other locks (upon which deadlocks on the
+nested locks are not reported).
 
 Within our experimental evaluation of L2D2, we have applied it on a set of 1,002
 C programs with POSIX threads derived from a Debian GNU/Linux distribution,
