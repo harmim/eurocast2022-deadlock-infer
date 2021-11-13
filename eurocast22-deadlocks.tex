@@ -60,7 +60,7 @@ However, concurrency does not only bring speed-ups but also a much larger space
 for nasty errors easy to cause but difficult to find.
 %
 The reason why finding errors in concurrent programs is particularly hard is
-that their concurrently running threads may \emph{interleave} in many different
+that the concurrently running threads may \emph{interleave} in many different
 ways, with bugs hiding in just a few of them.
 %
 Such interleavings need not be discovered even by many-times repeated testing.
@@ -107,8 +107,8 @@ interpretation} or \emph{data-flow analysis}.
 %
 The former approach is supported, e.g., in \emph{Facebook Infer}---an
 open-source framework for creating highly scalable, compositional, incremental,
-and interprocedural static analysers based on abstract interpretation
-\cite{inferNFM15}.
+and interprocedural static analysers based on abstract
+interpretation~\cite{inferNFM15}.
 %
 % Facebook Infer has grown considerably, but it is still under active
 % development.
@@ -130,17 +130,18 @@ In this work, we propose a \emph{deadlock checker} that fits the common
 principles of analyses used in Infer and is applicable to \emph{C code} with
 \emph{lower-level lock manipulation}.
 %
-Our checker is called L2D2 for ``low-level deadlock detection''.
+Our checker is called L2D2 for ``low-level deadlock detector''.
 
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 \enlargethispage{6mm}
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Out of existing static deadlock checkers, L2D2 is probably closest to RacerX
-\cite{racerX03}, and some of the approaches used in L2D2 are inspired by RacerX.
+Out of existing static deadlock detectors, L2D2 is probably the closest to
+RacerX \cite{racerX03}, and some of the approaches used in L2D2 are inspired by
+RacerX.
 %
 However, unlike L2D2, RacerX uses a context-sensitive analysis, meaning that
-that each function needs to be reanalysed in a new context, which reduces the
+each function needs to be reanalysed in a new context, which reduces the
 scalability.
 
 %-----------------------------------------------------------------------------
