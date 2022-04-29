@@ -1,0 +1,14 @@
+Miter evaluation per second (adders):
+python plt.evalspersec.py ../csvs/wre/add/
+
+(multipliers)
+python plt.evalspersec.py ../csvs/eurocast/
+
+
+
+Adder approximation medians for various WCRE:
+python boxplot_medians.py add_wre_large.csv
+
+
+Multiplier8 approximation medians for various WCRE (values in the CODE !!):
+python boxplot_medians.py add_wre_large.csv
