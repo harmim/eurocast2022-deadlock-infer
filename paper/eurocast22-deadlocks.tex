@@ -1,0 +1,320 @@
+%-----------------------------------------------------------------------------
+% Eurocast 2022 on Deadlocks
+%-----------------------------------------------------------------------------
+
+\documentclass[runningheads]{llncs}
+
+% Packages
+\usepackage{pbox}
+\usepackage{graphicx}
+\usepackage{times}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+
+% Section counter (number subsubsections)
+\setcounter{tocdepth}{3}
+
+% Useful commands (todo, remark, ...)
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
+\newcommand{\rem}[1]{\textcolor{blue}{[NOTE: #1]}}
+\newcommand{\fixme}[1]{\textcolor{red}{[FIXME: #1]}}
+
+%-----------------------------------------------------------------------------
+\begin{document}
+%-----------------------------------------------------------------------------
+
+\newcommand{\thetitle}{Static Deadlock Detection in Low-Level C~Code}
+\title{\thetitle\thanks{%
+    The work was supported by the project
+    No.~20-07487S of the Czech Science Foundation.%
+}}
+\titlerunning{\thetitle}
+
+\author{%
+  Dominik Harmim \and
+  Vladim\'{\i}r Marcin \and
+  Lucie Svobodov\'{a} \and
+  Tom\'{a}\v{s} Vojnar%
+}
+\authorrunning{%
+    D. Harmim \and
+    V. Marcin \and
+    L. Svobodov\'{a} \and
+    T. Vojnar%
+}
+
+\institute{%
+    Faculty of Information Technology, Brno University of Technology \\
+    Brno, Czech Republic \\
+    \email{\{iharmim,vojnar\}@fit.vut.cz}%
+}
+
+\maketitle
+
+\begin{abstract}
+    \todo{\ldots}
+\end{abstract}
+
+%-----------------------------------------------------------------------------
+\section{Introduction}
+%-----------------------------------------------------------------------------
+
+\todo{\ldots}
+
+% Nowadays, programs often use \emph{multithreading} to utilise the many
+% processors of current computers better.
+% %
+% However, concurrency does bring not only speed-ups but also a~much larger
+% space for nasty errors easy to cause but difficult to find.
+% %
+% The reason why finding errors in concurrent programs is particularly hard is
+% that the concurrently running threads may \emph{interleave} in many different
+% ways, with bugs hiding in just a~few of them.
+% %
+% Such interleavings need not be discovered even by many-times repeated testing.
+
+% Coverage of such rare behaviours can be improved by approaches such as
+% \emph{systematic testing}~\cite{schedspec12} and \emph{noise-based
+% testing}~\cite{noise14}.
+% %
+% % \cite{contestframework03,anaconda}.
+% %
+% Another way is using \emph{extrapolating dynamic checkers}, such
+% as~\cite{fasttrack09},
+% %
+% % \cite{atomsetser08,velodrome08,realdeadlock09,fasttrack09},
+% %
+% which can report warnings about possible errors even if those are not seen in
+% the testing runs, based on spotting some of their symptoms.
+% %
+% Unfortunately, even though such checkers have proven quite useful in practice,
+% they can, of course, still miss errors.
+% %
+% Moreover, monitoring a~run of large software through such checkers may be
+% quite expensive too.
+
+% On the other hand, approaches based on \emph{model checking}, i.e., exhaustive
+% state-space exploration, can guarantee the discovery of all potentially
+% present errors.
+% %
+% % ---either in general or at least up to some bound, which is usually given in
+% % the number of context switches.
+% %
+% However, the scalability of these techniques is so far not sufficient to
+% handle truly large industrial code, even when combining it with methods such
+% as \emph{sequentialisation}~\cite{lazy-seq-16},
+% %
+% % \cite{lal-reps-08,abou-seq-11,lazy-seq-16},
+% %
+% which represents one of the most scalable approaches in the area.
+
+% An alternative to the above approaches, which can scale better than model
+% checking and can find bugs not found dynamically (though for the price of
+% potentially missing some errors and/or producing false alarms), is offered by
+% approaches based on \emph{static analysis}, e.g., in the form of
+% \emph{abstract interpretation} or \emph{data-flow analysis}.
+% %
+% The former approach is supported, e.g., in \emph{Facebook Infer}\,---\,an
+% open-source framework for creating highly scalable, compositional,
+% incremental, and interprocedural static analysers based on abstract
+% interpretation~\cite{inferNFM15}.
+% %
+% % Facebook Infer has grown considerably, but it is still under active
+% % development.
+% %
+% % It is employed every day not only in Facebook itself but also in other
+% % companies, such as Spotify, Uber, Mozilla, or Amazon.
+% %
+% Currently, Infer provides several analysers that check for various types of
+% bugs, such as buffer overflows, null-dereferencing, or memory leaks.
+% %
+% % However, most importantly, Facebook Infer is a~\emph{framework} for building
+% % new analysers quickly and easily.
+% %
+% As for \emph{concurrency-related bugs}, Infer provides support for finding
+% some forms of \emph{data races} and \emph{deadlocks}, but it is limited to
+% high-level Java and C++ programs~\cite{racerD18,inferCACM19}.
+% %
+% In this work, we propose a~\emph{deadlock checker} that fits the common
+% principles of analyses used in Infer and is applicable to \emph{C~code} with
+% \emph{lower-level lock manipulation}.
+% %
+% Our checker is called L2D2 for ``low-level deadlock detector''.
+
+% %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+% \enlargethispage{6mm}
+% %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+% Out of existing static deadlock detectors, L2D2 is probably the closest to
+% \mbox{RacerX}~\cite{racerX03}, and some of the approaches used in L2D2 are
+% inspired by RacerX.
+% %
+% However, unlike L2D2, RacerX uses a~context-sensitive analysis, meaning that
+% each function needs to be re-analysed in a~new context, which reduces the
+% scalability.
+
+%-----------------------------------------------------------------------------
+\section{Static Deadlock Detection in Low-Level Concurrent C~Code}
+%-----------------------------------------------------------------------------
+
+\todo{\ldots}
+
+% For scalability reasons, L2D2 runs \emph{along the call tree} of a~given
+% program, \emph{starting from its leaves}.
+% %
+% Each function is analysed just once without any knowledge of its possible call
+% contexts.
+% %
+% For each analysed function, we derive a~\emph{summary} that consists of
+% a~\emph{pre-condition} and \emph{post-condition}.
+% %
+% The summaries are then used when analysing functions higher up in the call
+% hierarchy.
+% %
+% % Intuitively, the pre-condition states what states of locks the function
+% % expects from its callers, and the post-condition reflects the effect of the
+% % function on the locks.
+% %
+% % More precisely,
+% %
+% Intuitively, the pre-condition of a~function states which locks are
+% \emph{expected to be locked or unlocked} upon a~call of the function to avoid
+% possible double-locking or unlocking, resp.
+% %
+% The post-condition contains information about which locks \emph{may be locked
+% or unlocked} at the exit of the function.
+% %
+% Next, the summary contains so-called \emph{lock dependencies} in the form of
+% pairs of locks $ (l_1, l_2) $ where locking of~$ l_2 $ was seen while~$ l_1 $
+% was locked.
+% %
+% At the end of the analysis, detecting cycles in the lock dependencies is used
+% to detect possible deadlocks.
+% %
+% Finally, the summary also contains information on which \emph{locks may be
+% locked and then again unlocked} within the given function, which is needed for
+% detecting lock dependencies with such locks in functions higher up in the call
+% hierarchy.
+
+% L2D2 further implements several heuristics intended to decrease the number
+% of possible false alarms.
+% %
+% For instance, since double-locking/unlocking errors are quite rare, their
+% detection may instead be used as an indicator that the analysis is
+% over-approximating too much, and it may reset (some of) the working sets.
+% %
+% An example of another heuristic used in L2D2 is the detection of so-called
+% \emph{gate locks}, i.e., locks guarding other locks (upon which deadlocks on
+% the nested locks are not reported).
+
+% Within our experimental evaluation of L2D2, we have applied it on a~set of
+% 1,002 C~programs with POSIX threads derived from a~Debian GNU/Linux
+% distribution, originally prepared for evaluating the static deadlock analyser
+% based on the~CProver framework proposed in~\cite{kroening16}.
+% %
+% The~benchmark consists of 11.4\,MLOC.
+% %
+% Eight of the programs contain a~known deadlock.
+% %
+% Like CProver, L2D2 was able to detect all the deadlocks.
+% %
+% On the remaining 994 programs, it produced 39 false alarms (78 of the programs
+% failed to compile since the Infer's front-end does not support some of the
+% constructions used).
+% %
+% We find this very encouraging, considering that the CProver's deadlock
+% detector produced 114 false alarms, 453 timeouts (w.r.t. our 30-minute time
+% limit), and ran out of the available 24\,GB of memory in 135 cases.
+% %
+% Altogether, L2D2 consumed less than~1\,\% of the time taken by CProver.
+
+%-----------------------------------------------------------------------------
+\section{Increasing Analysis Accuracy???}
+%-----------------------------------------------------------------------------
+
+\todo{\ldots}
+
+%-----------------------------------------------------------------------------
+\section{Experimental Evaluation}
+%-----------------------------------------------------------------------------
+
+\todo{\ldots}
+
+%-----------------------------------------------------------------------------
+\section{Related Work???}
+%-----------------------------------------------------------------------------
+
+\todo{\ldots}
+
+%-----------------------------------------------------------------------------
+\section{Conclusions and Future Work???}
+%-----------------------------------------------------------------------------
+
+\todo{\ldots}
+
+%-----------------------------------------------------------------------------
+% Bibliography
+%-----------------------------------------------------------------------------
+
+\bibliographystyle{abbrv}
+\bibliography{bibliography}
+
+% \begin{thebibliography}{1}
+% \vspace*{-2.5mm}
+
+% \bibitem{racerD18}
+% S.~Blackshear, N.~Gorogiannis, P.~O'Hearn, and I.~Sergey.
+% \newblock {RacerD: Compositional Static Race Detection}.
+% \newblock {\em Proc. of the ACM on Programming Languages},
+%   2(OOPSLA):144:1--144:28, 2018.
+
+% \bibitem{inferNFM15}
+% C.~Calcagno, D.~Distefano, J.~Dubreil, D.~Gabi, P.~Hooimeijer, M.~Luca,
+% P.~O'Hearn, I.~Papakonstantinou, J.~Purbrick, and D.~Rodriguez.
+% \newblock {Moving Fast with Software Verification}.
+% \newblock In {\em Proc. of NFM'15}, LNCS 9058. Springer, 2015.
+
+% \bibitem{inferCACM19}
+% D.~Distefano, M.~F\"{a}hndrich, F.~Logozzo, and P.~O'Hearn.
+% \newblock {Scaling Static Analyses at Facebook}.
+% \newblock {\em Commun. ACM}, 62(8):62--70, 2019.
+
+% \bibitem{racerX03}
+% D.~Engler and K.~Ashcraft.
+% \newblock {RacerX: Effective, Static Detection of Race Conditions and
+%   Deadlocks}.
+% \newblock In {\em Proc. of SOSP'03}. ACM, 2003.
+
+% \bibitem{noise14}
+% J.~Fiedor, V.~Hrub\'{a}, B.~K\v{r}ena, Z.~Letko, S.~Ur, and T.~Vojnar.
+% \newblock {Advances in Noise-based Testing}.
+% \newblock {\em Software Testing, Verification and Reliability}, 24(7):1--38,
+%   2014.
+
+% \bibitem{fasttrack09}
+% C.~Flanagan and S.~Freund.
+% \newblock {FastTrack: Efficient and Precise Dynamic Race Detection}.
+% \newblock In {\em Proc. of PLDI'09}. ACM, 2009.
+
+% \bibitem{kroening16}
+% D.~Kroening, D.~Poetzl, P.~Schrammel, and B.~Wachter.
+% \newblock {Sound Static Deadlock Analysis for C/Pthreads}.
+% \newblock In {\em Proc. of ASE'16}. ACM, 2016.
+
+% \bibitem{lazy-seq-16}
+% T.~Nguyen, B.~Fischer, S.~L.~Torre, G.~Parlato.
+% \newblock {Lazy Sequentialization for the Safety Verification of Unbounded
+%   Concurrent Programs}.
+% \newblock {\em Proc. of ATVA'16}, LNCS 9938. Springer, 2016.
+
+% \bibitem{schedspec12}
+% J.~Wu, Y.~Tang, H.~Hu, H.~Cui, and J.~Yang.
+% \newblock {Sound and Precise Analysis of Parallel Programs through Schedule
+%   Specialization}.
+% \newblock In {\em Proc. of PLDI'12}. ACM, 2012.
+
+% \end{thebibliography}
+
+%-----------------------------------------------------------------------------
+\end{document}
+%-----------------------------------------------------------------------------
