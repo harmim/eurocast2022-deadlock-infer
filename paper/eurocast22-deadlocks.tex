@@ -1,10 +1,13 @@
-%-----------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Eurocast 2022 on Deadlocks
-%-----------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[runningheads]{llncs}
 
 % Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[british]{babel}
 \usepackage{pbox}
 \usepackage{graphicx}
 \usepackage{times}
@@ -13,18 +16,17 @@
 \usepackage{dirtytalk}
 \usepackage{wrapfig}
 \usepackage{listings}
-
-% Useful commands (todo, remark, ...)
-\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
-\newcommand{\rem}[1]{\textcolor{blue}{[NOTE: #1]}}
-\newcommand{\fixme}[1]{\textcolor{red}{[FIXME: #1]}}
+\usepackage[ruled, linesnumbered, commentsnumbered, noend]{algorithm2e}
+\usepackage{xspace}
+\usepackage[hidelinks]{hyperref}
+\usepackage{etoolbox}
 
 \definecolor{bluekeywords}{rgb}{.13, .13, 1}
 \definecolor{greencomments}{rgb}{0, .5, 0}
 \definecolor{redstrings}{rgb}{.9, 0, 0}
 \lstset{
-    basicstyle=\ttfamily,
-    numberstyle=\ttfamily\footnotesize,
+    basicstyle=\ttfamily\footnotesize,
+    numberstyle=\ttfamily\scriptsize,
     keywordstyle=\color{bluekeywords},
     commentstyle=\color{greencomments},
     stringstyle=\color{redstrings},
@@ -38,29 +40,67 @@
     breaklines=true,
     breakatwhitespace=true,
     numbers=left,
-    xleftmargin=2em,
     captionpos=b,
-    belowskip=-.8\baselineskip,
-    % aboveskip=1\baselineskip,
+    belowskip=.1 \baselineskip,
+    aboveskip=.3 \baselineskip,
+    numberbychapter=false,
 }
 \lstdefinestyle{c}{language=c}
+\lstdefinestyle{sum}{numbers=none, basicstyle=\ttfamily\scriptsize}
 
-%-----------------------------------------------------------------------------
+% Algorithm2e settings
+\SetKwProg{Def}{def}{:}{end}
+\SetInd{.3em}{.3em}
+\makeatletter
+% This solves the problems with links which leads after the algorithm.
+\let\old@algocf@pre@ruled\@algocf@pre@ruled
+\renewcommand{\@algocf@pre@ruled}{%
+    \Hy@raisedlink{\hyper@anchorstart{algocf.\thealgocf}\hyper@anchorend}%
+    \old@algocf@pre@ruled}
+% Remove right hand margin in algorithm.
+\patchcmd{\@algocf@start}{-1.5em}{0pt}{}{}
+\makeatother
+
+\interfootnotelinepenalty=10000 % do not separate footnotes to multiple pages
+
+% Solves the first/last row of a paragraph on the previous/next page.
+\clubpenalty=10000
+\widowpenalty=10000
+
+% Useful commands (todo, remark, ...)
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
+\newcommand{\rem}[1]{\textcolor{blue}{[NOTE: #1]}}
+\newcommand{\fixme}[1]{\textcolor{red}{[FIXME: #1]}}
+
+\newcommand{\LLDD}{\textsc{L2D2}\xspace} % L2D2 does not work as a macro.
+\newcommand{\Infer}{\textsc{Infer}\xspace}
+\newcommand{\CProver}{\textsc{CProver}\xspace}
+\newcommand{\grep}{\texttt{grep}\xspace}
+\newcommand{\sort}{\texttt{sort}\xspace}
+\newcommand{\tgrep}{\texttt{tgrep}\xspace}
+\newcommand{\memcached}{\texttt{memcached}\xspace}
+\newcommand{\eprosimaDDS}{\textsc{eProsima/Fast-DDS}\xspace}
+\newcommand{\framac}{\textsc{Frama-C}\xspace}
+\newcommand{\mOne}{\texttt{mode\,1}\xspace}
+\newcommand{\mTwo}{\texttt{mode\,2}\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-%-----------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\thetitle}{Static Deadlock Detection in Low-Level C~Code}
-\title{\thetitle\thanks{%
-    The work was supported by the Czech Science Foundation (the project
-    No.~20-07487S) and the Brno Ph.D. Talent Scholarship Programme.%
-}}
+\title{\texorpdfstring{%
+    \thetitle\thanks{The work was supported by the project 20-07487S of the
+    Czech Science Foundation and the Brno Ph.D. Talent Scholarship
+    Programme.}\vspace*{-4mm}%
+}{\thetitle}}
 \titlerunning{\thetitle}
 
 \author{%
-  Dominik Harmim \and
-  Vladim\'{\i}r Marcin \and
-  Lucie Svobodov\'{a} \and
-  Tom\'{a}\v{s} Vojnar%
+    Dominik Harmim \and
+    Vladim\'{\i}r Marcin \and
+    Lucie Svobodov\'{a} \and
+    Tom\'{a}\v{s} Vojnar\vspace*{-2mm}%
 }
 \authorrunning{%
     D. Harmim \and
@@ -69,35 +109,34 @@
     T. Vojnar%
 }
 
-\institute{%
-    Faculty of Information Technology, Brno University of Technology \\
-    Brno, Czech Republic \\
-    \email{\{iharmim,vojnar\}@fit.vut.cz}%
+\institute{Faculty of Information Technology, Brno University of Technology,
+Czech Republic\vspace*{-6mm}}
+
+% \email{\{iharmim,vojnar\}@fit.vut.cz}
+
+\hypersetup{
+    pdftitle=\thetitle,
+    pdfauthor={D. Harmim, V. Marcin, L. Svobodov\'{a}, T. Vojnar},
+    pdfsubject={Eurocast'22 Paper},
 }
 
 \maketitle
 
-\begin{abstract}
-    We present a~novel \emph{scalable deadlock analyser} (\textsc{L2D2}) that
-    works \emph{compositionally} and applies to~\emph{C~code} with
-    \emph{low-level unstructured lock manipulation}. We proposed and
-    implemented \textsc{L2D2} as a~plugin of the Facebook/Meta \textsc{Infer}
-    framework. \textsc{L2D2} runs \emph{along the call tree} of a~given
-    program, \emph{starting from its leaves}. Each function is thus analysed
-    just once without any knowledge of its possible call contexts. For each
-    analysed function, we derive a~summary that contains \emph{lock
-    dependencies}. In the end, we compute the transitive closure of
-    these dependencies, and we consider found cycles as deadlocks.
-    Our experimental evaluation on a~set of C~programs with POSIX threads
-    derived from a~Debian GNU/Linux distribution with in total 11.4\,MLoC
-    shows that our approach is effective in practice, finding all known
-    deadlocks and giving false alarms in less than 4\,\% of the considered
-    programs only.
-\end{abstract}
+\begin{abstract} We present a~novel scalable deadlock analyser \LLDD capable of
+handling C~code with low-level unstructured lock manipulation. \LLDD runs along
+the call tree of a program, starting from its leaves, and analyses each function
+just once, without any knowledge of the call context. \LLDD builds function
+summaries recording information about locks that are assumed or known to be
+locked or unlocked at the entry, inside, and at the exit of functions, together
+with lock dependencies, and reports warnings about possible deadlocks when
+cycles in the lock dependencies are detected. We implemented \LLDD as a~plugin
+of the Facebook/Meta \Infer framework and report results of experiments on a
+large body of C as well as C++ code illustrating the effectiveness and
+efficiency of \LLDD.\end{abstract}
 
-%-----------------------------------------------------------------------------
-\section{Introduction}
-%-----------------------------------------------------------------------------
+%=============================================================================
+\vspace*{-9mm}\section{Introduction}\vspace*{-2mm}
+%=============================================================================
 
 Nowadays, programs often use \emph{multithreading} to utilise the many
 processors of current computers better. However, concurrency does bring not
@@ -105,8 +144,8 @@ only speed-ups but also a~much larger space for nasty errors easy to cause
 but difficult to find. The reason why finding errors in concurrent programs
 is particularly hard is that concurrently running threads may
 \emph{interleave} in many different ways, with bugs hiding in just a~few of
-them. Such interleavings need not be discovered even by many-times repeated
-testing.
+them. Such interleavings are hard to discover by testing even if
+it is many times repeated.
 
 Coverage of such rare behaviours can be improved using approaches such
 as \emph{systematic testing}~\cite{schedspec12} and \emph{noise-based
@@ -128,50 +167,90 @@ industrial code, even when combined with methods such as
 \emph{sequentialisation}~\cite{lal-reps-08,lazy-seq-16}, which represents
 one of the most scalable approaches in the area.
 
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+% >>> If not enough space, rephrase not speak about data-flow analysis.
+
 An alternative to the above approaches, which can scale better than model
 checking and can find bugs not found dynamically (though for the price of
-potentially missing some errors and/or producing false alarms), is offered
-by approaches based on \emph{static analysis}, e.g., in the form of
-\emph{abstract interpretation}~\cite{ai77} or
-\emph{data-flow analysis}~\cite{dfa73}. The former approach is supported,
-e.g., in Facebook/Meta \textsc{Infer}\,---\,an open-source framework for
-creating highly scalable, compositional, incremental, and interprocedural
-static analysers based on abstract interpretation~\cite{inferNFM15}.
-\textsc{Infer} has initially been a~rather specialised tool focused on
-\emph{sound verification} of the absence of memory safety violations,
-which was first published in the well-known paper~\cite{biabd09}. Once
-Facebook/Meta has purchased it, its scope significantly widened and
-abandoned the focus on sound analysis only. \textsc{Infer} has grown
-considerably, but it is still under active development. It is employed
-every day not only in Facebook/Meta itself but also in other companies,
-such as Amazon, Microsoft, Mozilla, Spotify, or Uber. Currently,
-\textsc{Infer} provides several analysers that check for various types
-of bugs, such as buffer overflows, null-dereferencing, or memory leaks.
-However, most importantly, \textsc{Infer} is a~\emph{framework} for
-building new analysers quickly and easily. As for
-\emph{concurrency-related bugs}, \textsc{Infer} provides support for
-finding some forms of \emph{data races} and \emph{deadlocks}, but it is
-limited to \emph{high-level} Java and C++ programs only and fails for
-C~programs, which use a~\emph{lower-level lock
-manipulation}~\cite{racerD18,inferCACM19}.
+potentially missing some errors and/or producing false alarms), is offered by
+approaches based on \emph{static analysis}, e.g., in the form of \emph{abstract
+interpretation}~\cite{ai77} or \emph{data-flow analysis}~\cite{dfa73}. The
+former approach is supported, e.g., in Facebook/Meta \textsc{Infer}\,---\,an
+open-source framework for creating highly scalable, compositional,
+incremental, and interprocedural static analysers based on abstract
+interpretation~\cite{inferNFM15}.
+
+% TV: commented out to save space.
+%
+% \Infer has initially been a~rather specialised tool focused on \emph{sound
+% verification} of the absence of memory safety violations, which was first
+% published in the well-known paper~\cite{biabd09}. Once Facebook/Meta has
+% purchased it, its scope significantly widened and abandoned the primary focus
+% on sound analysis. \Infer has grown considerably, but it is still under active
+% development. It is employed every day not only in Facebook/Meta itself but
+% also in other companies, such as Amazon, Microsoft, Mozilla, Spotify, or Uber. 
+
+\Infer provides several analysers that check for various types of bugs, such as
+buffer overflows, null-dereferencing, or memory leaks.  However, most
+importantly, \Infer is a~\emph{framework} for building new analysers quickly and
+easily. As for \emph{concurrency-related bugs}, \Infer provides support for
+finding some forms of \emph{data races} and \emph{deadlocks}, but it is limited
+to \emph{high-level} Java and C++ programs only and fails for C~programs, which
+use a~\emph{lower-level lock manipulation}~\cite{racerD18,inferCACM19}.
 
 In this paper, we propose a~\emph{deadlock checker} that fits the common
-principles of analyses used in \textsc{Infer} and is applicable to
-\emph{C~code} with \emph{lower-level lock manipulation}. Our checker is
-called \textsc{L2D2} for \say{low-level deadlock detector}.
+principles of analyses used in \Infer and is applicable even to \emph{C~code}
+with \emph{lower-level lock manipulation}. Our checker is called \LLDD for
+\say{low-level deadlock detector}.
 
-\paragraph{Structure of the Paper}
-The rest of this paper is organised as follows. Section~\ref{sec:relwork}
-discusses related work. A~design of the \textsc{L2D2} analyser is
-introduced in Section~\ref{sec:l2d2}. The paper then goes on in
-Section~\ref{sec:heuristics} to outline several considered heuristics that
-increase accuracy of the analysis. This is followed by
-Section~\ref{sec:experiments}, which covers the experimental evaluation of
-the implemented approach. Finally, the paper is concluded and further
-research directions are provided in Section~\ref{sec:con}.
+As is common in \Infer, \LLDD computes function summaries \emph{upwards} along
+the call tree, starting from its leaves, and analyses every function just once,
+without knowing anything about its call contexts.
+%
+The summaries contain various pieces of information about locks that are assumed
+to be locked/unlocked at the entry of a function, that may be locked/unlocked at
+the end of the function, that may be both locked and unlocked inside a function,
+as well as about lock dependencies (saying that some lock is locked while
+another is still held).
+%
+If \LLDD detects a loop in the lock dependencies, it warns about possible
+deadlocks.
+%
+\LLDD uses multiple heuristics to reduce the number of false alarms, such as
+detection of locks serving as gate locks.
 
-\subsection{Related Work}
-\label{sec:relwork}
+To illustrate the effectiveness and efficiency of \LLDD, we present experiments
+in which we applied it to more than 11.1 million lines of code (MLoC),
+re-discovering all known present deadlocks, and \todo{say something nice about
+the error rate, including even sort, grep, ... On the level of programs?
+Percentage of false warning wrt all warnings (not counting the symmetric ones)?}
+%
+The code included benchmarks coming from the \CProver tool derived from the
+Debian GNU/Linux distribution, the code of the \grep, \sort, and \tgrep
+utilities, as well as the \eprosimaDDS middleware. 
+
+% TV: not enough space, not needed in such a short paper.
+%
+% %-----------------------------------------------------------------------------
+% % \paragraph{Structure of the Paper} 
+% %-----------------------------------------------------------------------------
+%
+% The rest of this paper is organised as follows. Section~\ref{sec:relwork}
+% discusses the related work. The~design of the \LLDD analyser is introduced in
+% Section~\ref{sec:l2d2}. The paper then goes on in Section~\ref{sec:heuristics}
+% to outline several considered heuristics that increase the accuracy of the
+% analysis. This is followed by Section~\ref{sec:experiments} which covers the
+% experimental evaluation of the implemented approach. Finally, the paper is
+% concluded and further research directions are provided in Section~\ref{sec:con}.
+
+%-----------------------------------------------------------------------------
+\vspace*{-3mm}\paragraph{Related Work} % \label{sec:relwork}
+%-----------------------------------------------------------------------------
+
+\fixme{TV: not processed from here.}
 
 Nowadays, there is a~number of tools for deadlock detection in
 multi-threaded programs. A~common deficiency of a~large number of them
@@ -179,12 +258,18 @@ is that they are unsound and/or incomplete, or they are precise, but
 their requirements on time and resources are unacceptable when applied to
 large codebases.
 
-To our knowledge, \textsc{L2D2} is the only available \emph{compositional
-static deadlock analyser} for \emph{low-level code}. Nevertheless, in this
-section, we briefly compare our contribution to related work, first, on
-dynamic tools, and second, on static tools.
+To our knowledge, \LLDD is the only available \emph{compositional static
+deadlock analyser} for \emph{low-level code}. Nevertheless, in this section, we
+briefly compare our contribution to related work, first, on dynamic tools, and
+second, on static tools.
 
-\subsubsection{Dynamic Analyses}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+%-----------------------------------------------------------------------------
+\vspace*{-4mm}\subsubsection{Dynamic Analyses}
+%-----------------------------------------------------------------------------
 
 Dynamic analysers work with \emph{program traces}. They require the whole
 program as well as appropriate \emph{test input data}, and their scalability
@@ -210,18 +295,19 @@ running a~polynomial-time algorithm on the lock graph to eliminate parts
 without cycles before running the higher-cost algorithm to detect
 actual lock cycles.
 
-\subsubsection{Static Analyses}
+%-----------------------------------------------------------------------------
+\vspace*{-4mm}\subsubsection{Static Analyses}
+%-----------------------------------------------------------------------------
 
-Static deadlock detectors can often handle much larger systems and may
-produce sound results. However, static techniques are generally incomplete,
-so soundness is sometimes dropped to minimise the number of false alarms.
-Most of the existing deadlock analysers are interprocedural, top-down,
-context-sensitive, and non-compositional. Although, this is not the case
-of \textsc{L2D2} and the below-mentioned \textsc{Starvation} checker, which
-are both \emph{bottom-up}, \emph{context-insensitive}, and
-\emph{compositional}. Below are listed three analyses in some aspects close
-to \textsc{L2D2}; indeed, some of the approaches used in \textsc{L2D2} are
-inspired by them.
+Static deadlock detectors can often handle much larger systems and may produce
+sound results. However, static techniques are generally incomplete, so soundness
+is sometimes dropped to minimise the number of false alarms.  Most of the
+existing deadlock analysers are interprocedural, top-down, context-sensitive,
+and non-compositional. Although, this is not the case of \LLDD and the
+below-mentioned \textsc{Starvation} checker, which are both \emph{bottom-up},
+\emph{context-insensitive}, and \emph{compositional}. Below are listed three
+analyses in some aspects close to \LLDD; indeed, some of the approaches used in
+\LLDD are inspired by them.
 
 \textsc{RacerX}~\cite{racerX03} is a~flow-sensitive (based on
 \emph{data-flow analysis}) and context-sensitive analysis for C~programs
@@ -232,7 +318,7 @@ analysis, and many heuristics are employed to reduce false-positive
 reports. This approach, however, still produces many false alarms due to
 the used approximations, and its context sensitivity reduces the scalability.
 
-The deadlock analyser implemented within the \textsc{CProver}
+The deadlock analyser implemented within the \CProver
 framework~\cite{kroening16} targeting C~code with POSIX threads uses
 a~combination of multiple analyses to create a~sound analysis. The analysis
 is context-sensitive and is based on \emph{abstract interpretation}. It also
@@ -242,172 +328,509 @@ which takes most of the analysis time. An experimental comparison with this
 tool is given in Section~\ref{sec:experiments}.
 
 \textsc{Starvation}~\cite{deadlock-nikos21} is one of the most successful
-state-of-the-art deadlock analysers. It is implemented in the
-\textsc{Infer} framework; therefore, it is bottom-up, context-insensitive,
-compositional, and abstract interpretation based. As a~matter of fact, to
-our best knowledge, it is the only existing deadlock detector that works
-compositionally. It detects deadlocks by deriving lock dependencies for each
-function and checking whether some other function uses the locks in inverse
-order. It is thus similar to \textsc{L2D2}, but \textsc{Starvation} is
-limited to \emph{high-level} Java and C++ programs with \emph{balanced
-locks} only. Moreover, it implements many heuristics explicitly tailored
-for Android Java applications.
+state-of-the-art deadlock analysers. It is implemented in the \Infer framework;
+therefore, it is bottom-up, context-insensitive, compositional, and
+abstract-interpretation-based. As a~matter of fact, to our best knowledge,
+it is the only existing deadlock detector that works compositionally. It
+detects deadlocks by deriving lock dependencies for each function and
+checking whether some other function uses the locks in inverse order. It is
+thus similar to \LLDD, but \textsc{Starvation} is limited to
+\emph{high-level} Java and C++ programs with \emph{balanced locks} only.
+Moreover, it implements many heuristics explicitly tailored for Android Java
+applications.
 
-%-----------------------------------------------------------------------------
-\section{Static Deadlock Detection in Low-Level Concurrent C~Code}
-\label{sec:l2d2}
-%-----------------------------------------------------------------------------
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-This section presents the design of the \textsc{L2D2} analyser. First, we
+%=============================================================================
+\vspace*{-4mm}\section{Static Deadlock Detection in Low-Level Concurrent
+C~Code}\vspace*{-2mm} \label{sec:l2d2}
+%=============================================================================
+
+This section presents the design of the \LLDD analyser. First, we
 sketch out the basic ideas of the analysis. Further, we introduce the
 algorithm of the analyser in more detail. In the end, we show an algorithm
 for reporting deadlocks.
 
-As already mentioned, \textsc{L2D2} is designed to work
-\emph{compositionally}\footnote{\emph{Compositionality} allows us to
-concentrate only on \emph{modified files} and their dependants. A~summary of
-a~function call depends only on the current state of the caller, which can
-be computed in advance. This means that\,---\,when analysing a~code
-revision\,---\,we do not need to re-analyse the unchanged functions in the
-program (i.e. the vast majority).} and be applied to \emph{C~code} with
-\emph{low-level unstructured lock manipulation}. For scalability reasons,
-\textsc{L2D2} does not run the analysis along the \emph{Control-Flow Graph
-(CFG)} as it is done in classical analyses based on the concepts, e.g.,
-from~\cite{dfagr95}. Instead, \textsc{L2D2} performs the analysis of
-a~program \emph{function-by-function along the call tree}, \emph{starting
-from its leaves} (as typical for the \textsc{Infer} framework). Therefore,
-each function is analysed just once without any knowledge of its possible
-call contexts. For each analysed function, we derive a~\emph{summary}
-that consists of a~\emph{pre-condition} and \emph{post-condition}. The
-summaries are then used when analysing functions higher up in the call
-hierarchy. More details on how the summaries look and how they are
-computed will be given in Section~\ref{sec:summaries}.
+As already mentioned, \LLDD is designed to work
+\emph{compositionally}\footnote{\emph{Compositionality} allows us to focus
+only on \emph{modified files} and their dependants. A~summary of a~function
+call depends only on the current state of the caller. Thus, we do not need to
+re-analyse the unchanged functions in the program (i.e. the vast majority).}
+and be applied to \emph{C~code} with \emph{low-level unstructured lock
+manipulation}. For scalability reasons, \LLDD does not run the analysis
+along the \emph{Control-Flow Graph (CFG)} as it is done in classical
+analyses based on the concepts, e.g., from~\cite{dfagr95}. Instead,
+\LLDD performs the analysis of a~program \emph{function-by-function along
+the call tree}, \emph{starting from its leaves} (as typical for the \Infer
+framework). Therefore, each function is analysed just once without any
+knowledge of its possible call contexts. For each analysed function, we
+derive a~\emph{summary} that consists of a~\emph{pre-condition} and
+\emph{post-condition}. The summaries are then used when analysing
+functions higher up in the call hierarchy. More details on how the
+summaries look and how they are computed will be given in
+Section~\ref{sec:summaries}.
 
 We use \emph{syntactic access paths}~\cite{ap15} to represent lock objects.
-This mechanism is already built in the \textsc{Infer} framework. The access
-paths represent heap locations via the paths used to access them. Then,
-\textsc{L2D2} does not have to perform a~classical \emph{alias analysis},
-i.e., a~precise analysis for saying whether arbitrary pairs of accesses to
-lock objects may alias (such an analysis is considered too
-expensive\,---\,no such sufficiently precise analysis works compositionally
-and at scale). According to the authors of~\cite{racerD18}, the access paths'
-syntactic equality is a~reasonably efficient way to say (in an
-under-approximate fashion) that heap accesses touch the same address. They
-used this mechanism in \textsc{RacerD}~\cite{racerD18} to detect many data
-races in real-world programs.
+This mechanism is already built in the \Infer framework. The access paths
+represent heap locations via the paths used to access them. Then, \LLDD does not
+have to perform a~classical \emph{alias analysis}, i.e., a~precise analysis for
+saying whether arbitrary pairs of accesses to lock objects may alias (such an
+analysis is considered too expensive\,---\,no such sufficiently precise analysis
+works compositionally and at scale). According to the authors
+of~\cite{racerD18}, the access paths' syntactic equality is a~reasonably
+efficient way to say (in an under-approximate fashion) that heap accesses touch
+the same address. They used this mechanism in \textsc{RacerD}~\cite{racerD18} to
+detect many data races in real-world programs.
 
-% \newpage
+\begin{wrapfigure}{l}{.3 \textwidth}
+\vspace*{-2em}
+\begin{lstlisting}[
+    style=c, label={list:example}, caption={An example capturing a~deadlock}
+]
+void f(Lock *<@\textcolor{cyan}{L3'}@>) {
+  lock(&<@\textcolor{brown}{L4}@>);
+  unlock(&<@\textcolor{cyan}{L3'}@>);
+  lock(&<@\textcolor{magenta}{L2}@>);
+  <@\ldots@>
+  unlock(&<@\textcolor{brown}{L4}@>); }
+void *t1(<@\ldots@>) {
+  lock(&<@\textcolor{teal}{L1}@>);
+  lock(&<@\textcolor{cyan}{L3}@>);
+  <@\ldots@>
+  f(&<@\textcolor{cyan}{L3}@>);
+  unlock(&<@\textcolor{teal}{L1}@>); }
+void *t2(<@\ldots@>) {
+  lock(&<@\textcolor{magenta}{L2}@>);
+  <@\ldots@>
+  lock(&<@\textcolor{teal}{L1}@>); }
+\end{lstlisting}
+\vspace*{-2em}
+\end{wrapfigure}
 
-% \begin{wrapfigure}{r}{.6 \textwidth}
-% \begin{lstlisting}[
-%     style=c, label={list:basicEx}, caption={Lorem ipsum dolor sit amet}
-% ]
-% void invoke(char *method) {
-%   <@\texttt{\ldots}@>
-%   if (server.<@\textbf{is\_registered}@>()) {
-%     server.<@\textbf{invoke}@>(method);
-%   }
-%   <@\texttt{\ldots}@>
-% }
-% \end{lstlisting}
-% \end{wrapfigure}
-% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed faucibus gravida est a dictum. Aliquam nisi libero, posuere sit amet tincidunt quis, dictum a tortor. Nullam varius elit et quam maximus fermentum. Fusce in arcu a odio condimentum hendrerit. Nunc a orci et sem aliquet blandit quis at orci. Ut id est augue. Vestibulum cursus risus quis turpis pellentesque pretium. Nullam convallis purus et lectus convallis volutpat. Aliquam tristique quam eu elit tempus, in dapibus metus congue. Praesent nisl purus, sollicitudin vel elementum vitae, varius sed tellus. Vivamus in convallis nisi. Phasellus erat leo, sodales ac erat quis, suscipit facilisis felis. Ut et tortor malesuada, placerat tellus id, euismod nisi.
+The essential idea of \LLDD's analysis will be illustrated in
+Listing~\ref{list:example}. \LLDD works in two phases. In the first
+phase, it computes a~summary for each function by looking for lock/unlock
+events (\texttt{lock}/\texttt{unlock} calls in the listing) in the
+function. Suppose a~user-defined function call appears in the analysed
+function during the analysis (like on line~11 in the listing). In that
+case, the analyser is provided with a~summary of the function if
+available. Otherwise, the function is analysed on demand, effectively
+analysing the code bottom-up. The summary is then applied to an
+\emph{abstract state} at the call site. In the listing, the summary
+of~\texttt{f} will be applied to the abstract state of~\texttt{t1}.
 
-% % Intuitively, the pre-condition states what states of locks the function
-% % expects from its callers, and the post-condition reflects the effect of the
-% % function on the locks.
-% %
-% % More precisely,
-% %
-% Intuitively, the pre-condition of a~function states which locks are
-% \emph{expected to be locked or unlocked} upon a~call of the function to avoid
-% possible double-locking or unlocking, resp.
-% %
-% The post-condition contains information about which locks \emph{may be locked
-% or unlocked} at the exit of the function.
-% %
-% Next, the summary contains so-called \emph{lock dependencies} in the form of
-% pairs of locks $ (l_1, l_2) $ where locking of~$ l_2 $ was seen while~$ l_1 $
-% was locked.
-% %
-% At the end of the analysis, detecting cycles in the lock dependencies is used
-% to detect possible deadlocks.
-% %
-% Finally, the summary also contains information on which \emph{locks may be
-% locked and then again unlocked} within the given function, which is needed for
-% detecting lock dependencies with such locks in functions higher up in the call
-% hierarchy.
+In the second phase, \LLDD looks through all computed summaries of the
+analysed program and focuses on so-called \emph{dependencies} that
+are part of the summaries. These dependencies represent a~possible
+locking behaviour of an analysed program. The obtained set of
+dependencies is interpreted as a~relation. \LLDD computes the transitive
+closure of this relation and reports a~deadlock if some lock depends on
+itself in the closure. If we run \LLDD on the code in
+Listing~\ref{list:example}, it will report a~potential deadlock due to
+the cyclic dependency between locks~\texttt{\textcolor{teal}{L1}}
+and~\texttt{\textcolor{magenta}{L2}} that arises when thread~\texttt{t1}
+holds~\texttt{\textcolor{teal}{L1}} and waits
+on~\texttt{\textcolor{magenta}{L2}} and thread~\texttt{t2}
+holds~\texttt{\textcolor{magenta}{L2}} and waits
+on~\texttt{\textcolor{teal}{L1}}.
 
-\subsection{Computing Function Summaries}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+%-----------------------------------------------------------------------------
+\vspace*{-4mm}\subsection{Computing Function Summaries}\vspace*{-2mm}
 \label{sec:summaries}
+%-----------------------------------------------------------------------------
 
-\todo{\ldots}
+This section outlines the structure and computation of the summaries used
+in the analysis. Intuitively, the pre-condition expresses what states of
+locks a~function expects from its callers, and the post-condition reflects
+the effect of a~function on the locks. More precisely, the post-condition
+contains \texttt{lockset}/\texttt{unlockset} sets, holding information about
+which locks \emph{may be locked}/\emph{unlocked}, resp., at the exit of
+a~function. The pre-condition includes \texttt{locked}/\texttt{unlocked}
+sets, stating which locks are \emph{expected to be locked}/\emph{unlocked},
+resp., upon a~call of a~function. Note that these
+\texttt{locked}/\texttt{un\-locked} sets are maintained but not used in the
+basic algorithm introduced later in this section. They are used to avoid
+possible \emph{double-locking}/\emph{unlocking}, see
+Section~\ref{sec:heuristics}. Next, the summary's post-condition contains
+so-called \emph{lock dependencies} (\texttt{deps}) in the form of pairs of
+locks $ (\text{\texttt{\textcolor{magenta}{L2}},
+\texttt{\textcolor{teal}{L1}}}), $ where locking of
+\texttt{\textcolor{teal}{L1}} was observed while
+\texttt{\textcolor{magenta}{L2}} was locked. This exact situation can be
+seen in Listing~\ref{list:example} on line~16.
 
-\subsection{Reporting Deadlocks}
+\begin{wrapfigure}{l}{.34 \textwidth}
+\vspace*{-2em}
+\begin{lstlisting}[
+    style=sum, label={list:sum}, caption={Summaries for the functions from
+    Listing~\ref{list:example}}
+]
+<@\textbf{f:}@>  <@\textbf{\textcolor{bluekeywords}{PRE-CONDITION}}@>
+ locked={<@\textcolor{cyan}{L3'}@>}
+ unlocked={<@\textcolor{magenta}{L2}@>, <@\textcolor{brown}{L4}@>}
+    <@\textbf{\textcolor{bluekeywords}{POST-CONDITION}}@>
+ lockset={<@\textcolor{magenta}{L2}@>}
+ unlockset={<@\textcolor{cyan}{L3'}@>, <@\textcolor{brown}{L4}@>}
+ wereLocked={<@\textcolor{magenta}{L2}@>, <@\textcolor{brown}{L4}@>}
+ deps={(<@\textcolor{brown}{L4}@>, <@\textcolor{magenta}{L2}@>)}
+ order={(<@\textcolor{cyan}{L3'}@>, <@\textcolor{magenta}{L2}@>)}
+<@\textbf{t1:}@> <@\textbf{\textcolor{bluekeywords}{PRE-CONDITION}}@>
+ unlocked={<@\textcolor{teal}{L1}@>, <@\textcolor{magenta}{L2}@>, <@\textcolor{cyan}{L3}@>, <@\textcolor{brown}{L4}@>}
+    <@\textbf{\textcolor{bluekeywords}{POST-CONDITION}}@>
+ lockset={<@\textcolor{magenta}{L2}@>}
+ unlockset={<@\textcolor{teal}{L1}@>, <@\textcolor{cyan}{L3}@>, <@\textcolor{brown}{L4}@>}
+ wereLocked={<@\textcolor{teal}{L1}@>, <@\textcolor{magenta}{L2}@>, <@\textcolor{cyan}{L3}@>, <@\textcolor{brown}{L4}@>}
+ deps={(<@\textcolor{teal}{L1}@>, <@\textcolor{magenta}{L2}@>), (<@\textcolor{teal}{L1}@>, <@\textcolor{cyan}{L3}@>),
+  (<@\textcolor{teal}{L1}@>, <@\textcolor{brown}{L4}@>), (<@\textcolor{cyan}{L3}@>, <@\textcolor{brown}{L4}@>)}
+<@\textbf{t2:}@>  <@\textbf{\textcolor{bluekeywords}{PRE-CONDITION}}@>
+ unlocked={<@\textcolor{teal}{L1}@>, <@\textcolor{magenta}{L2}@>}
+     <@\textbf{\textcolor{bluekeywords}{POST-CONDITION}}@>
+ lockset={<@\textcolor{teal}{L1}@>, <@\textcolor{magenta}{L2}@>}
+ wereLocked={<@\textcolor{teal}{L1}@>, <@\textcolor{magenta}{L2}@>}
+ deps={(<@\textcolor{magenta}{L2}@>, <@\textcolor{teal}{L1}@>)}
+\end{lstlisting}
+\vspace*{-2em}
+\end{wrapfigure}
 
-\todo{\ldots}
+To make the analysis work correctly w.r.t. interprocedurality, we added
+two more sets to the summary's post-condition. First, we introduced
+a~\texttt{wereLocked} set, containing information on which \emph{locks
+may be locked and then again unlocked} within a~given function. This is
+needed to detect lock dependencies with such locks in functions higher up
+in the call hierarchy. Such a~situation can be seen in
+Listing~\ref{list:example}. Lock~\texttt{\textcolor{brown}{L4}} is locked
+and then unlocked again within function~\texttt{f}. In this case, the
+lock will not be in \texttt{lockset}, and we would have no information
+that it was locked there. Consequently, we would not create any lock
+dependencies w.r.t. this lock. However, this lock will appear
+in \texttt{wereLocked}, so we can create dependencies with it (like
+dependency $ (\text{\texttt{\textcolor{teal}{L1}},
+\texttt{\textcolor{brown}{L4}}}) $ in function~\texttt{t1} when
+calling~\texttt{f} on line~11, which could not be created otherwise).
+
+The second set that we added to the post-condition is \texttt{order}. It
+comprises pairs of locks $ (\text{\texttt{\textcolor{cyan}{L3'}}, 
+\texttt{\textcolor{magenta}{L2}}}) $ where locking
+of~\texttt{\textcolor{magenta}{L2}} was seen
+when~\texttt{\textcolor{cyan}{L3'}} was unlocked before within the same
+function. This pair is captured on line~4 in Listing~\ref{list:example}.
+Thanks to this set, we can safely determine the order of operations in
+functions. Without this, we would create, e.g., a~non-existent dependency
+$ (\text{\texttt{\textcolor{cyan}{L3}}, \texttt{\textcolor{magenta}{L2}}}) $
+in function~\texttt{t1} when calling~\texttt{f} on line~11. It should not
+be created because~\texttt{\textcolor{cyan}{L3}} is unlocked in~\texttt{f}
+on line~3 before~\texttt{\textcolor{magenta}{L2}} is locked on line~4. Note
+that lock~\texttt{\textcolor{cyan}{L3}} from function~\texttt{t1} is
+passed to~\texttt{f} as~\texttt{\textcolor{cyan}{L3'}}. We resolve such
+situations by replacing the function's formal parameters with the
+actual ones at the concrete call site.
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+An example of how the summaries for the functions from
+Listing~\ref{list:example} look is shown in Listing~\ref{list:sum}
+(empty sets are omitted in the listing).
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{.54 \textwidth}
+\centering
+\begin{algorithm}[H]
+    \KwData{lock~$ L $ being locked; abstract state~$ S $}
+%
+    \Def{\texttt{\upshape{lock($ L $, $ S $)}}}{%
+        \If{$ L \notin S.\{locked, unlocked\} $}{%
+            $ S.unlocked \gets S.unlocked \cup \{L\} $\;
+        }
+        $ S.lockset \gets S.lockset \cup \{L\} $\;
+        $ S.unlockset \gets S.unlockset \setminus \{L\} $\;
+        $ S.wereLocked \gets S.wereLocked \cup \{L\} $\;
+        $ S.deps \gets S.deps \cup (S.lockset \times \{L\}) $\;
+        $ S.order \gets S.order \cup (S.unlockset \times \{L\}) $\;
+    }
+%
+    \caption{Lock acquisition}
+    \label{alg:lock}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}{.45 \textwidth}
+\centering
+\begin{algorithm}[H]
+    \KwData{lock~$ L $ being unlocked; abstract state~$ S $}
+%
+    \Def{\texttt{\upshape{unlock($ L $, $ S $)}}}{%
+        \If{$ L \notin S.\{locked, unlocked\} $}{%
+            $ S.locked \gets S.locked \cup \{L\} $\;
+        }
+        $ S.unlockset \gets S.unlockset \cup \{L\} $\;
+        $ S.lockset \gets S.lockset \setminus \{L\} $\;
+    }
+%
+    \caption{Lock release}
+    \label{alg:unlock}
+\end{algorithm}
+\end{minipage}
+\vspace*{-6mm}
+\end{figure}
+
+The high-level algorithm for the summary's computation is given in
+Algorithms~\ref{alg:lock}, \ref{alg:unlock}, and~\ref{alg:sum}.
+Algorithm~\ref{alg:lock} shows how the abstract state is updated whenever
+locking occurs during the analysis. First, it updates the pre-condition by
+adding the lock to the \texttt{unlocked} set if this locking is the first
+operation with that lock in a~given function (lines 2--3). Intuitively, this
+reflects that the lock should be unlocked before calling the analysed
+function; otherwise, we would encounter double-locking. Next, the lock
+acquisition takes place, meaning that the lock is added to \texttt{lockset}
+and removed from \texttt{unlockset} (lines 4--5). Moreover, the lock is
+added to \texttt{wereLocked} (line~6). Finally, we derive new dependencies
+and order edges by considering all pairs $ (L^\prime, L) $
+where~$ L^\prime $ is an element of \texttt{lockset} and \texttt{unlockset},
+resp., and~$ L $ is the acquired lock (lines 7--8).
+Algorithm~\ref{alg:unlock} then provides abstract state's updating when
+some lock is released. It works analogically like the algorithm for locking,
+but it does not update the \texttt{wereLocked}, \texttt{deps}, and
+\texttt{order} sets.
+
+\begin{figure}[t]
+\centering
+\begin{algorithm}[H]
+    \KwData{summary~$ \chi $ of a~callee; abstract state~$ S $}
+%
+    \Def{\texttt{\upshape{apply\_summary($ \chi $, $ S $)}}}{%
+        $ \chi \gets \mathtt{replace\_formals\_with\_actuals}(\chi) $\;
+        \lIf{$ \exists L : L \in \chi.unlocked \wedge L \notin S.unlockset $}{%
+            $ S.unlocked \gets S.unlocked \cup \{L\} $%
+        }
+        \lIf{$ \exists L : L \in \chi.locked \wedge L \notin S.lockset $}{%
+            $ S.locked \gets S.locked \cup \{L\} $%
+        }
+        $ S.lockset \gets (S.lockset \cup \chi.lockset) \setminus
+            \chi.unlockset $\;
+        $ S.unlockset \gets (S.unlockset \setminus \chi.lockset) \cup
+            \chi.unlockset $\;
+        $ S.wereLocked \gets S.wereLocked \cup \chi.wereLocked $\;
+        $ S.deps \gets S.deps \cup ((S.lockset \times \chi.wereLocked)
+            \setminus \chi.order) $\;
+    }
+%
+    \caption{Integrating a~summary of a~callee}
+    \label{alg:sum}
+\end{algorithm}
+\vspace*{-6mm}
+\end{figure}
+
+Algorithm~\ref{alg:sum} integrates a callee's summary with the abstract
+state of an analysed function. Initially, the summary is updated by
+replacing the formal parameters with the actual ones (line~2). We also
+check that all the locks that should be locked/unlocked before calling the
+callee are present in \texttt{lockset}/\texttt{unlockset}, resp. If they
+are not, they must be locked/unlocked even before the currently analysed
+function. Hence, we update the pre-condition (lines 3--4). On lines 5--7,
+the \texttt{lockset}, \texttt{unlockset}, and \texttt{wereLocked} sets are
+appropriately modified. At last, new dependencies between the currently
+held locks and locks acquired in the callee are introduced (line~8).
+However, we exclude all the dependencies from the \texttt{order} set to
+avoid adding such $ (L^\prime, L) $ dependencies where~$ L^\prime $ was
+unlocked before locking~$ L $ in the callee.
+
+\LLDD also has to combine states along \emph{confluent program paths}
+(e.g. \texttt{if} statements). As the analysis is
+abstract-interpretation-based, we must define the \emph{join, ordering,
+and widening operators}. Since we are interested in locking patterns along
+any possible path, we defined the join operator as the union of
+incoming states' values for all the sets in the summaries. The ordering
+operator was then defined as testing for a~subset of these sets. Then, we
+defined the widening operator using the join operator as we are
+working with finite-domain summaries, and we do not need any accumulation
+at loop junctions.
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 %-----------------------------------------------------------------------------
-\section{Increasing Analysis Accuracy}
+\vspace*{-4mm}\subsection{Reporting Deadlocks}\vspace*{-2mm}
+%-----------------------------------------------------------------------------
+
+This section discusses the deadlock checking algorithm. Our algorithm
+reports possible deadlocks between two locks. The checking takes place
+after the summaries for all functions in the analysed program are computed.
+\LLDD then merges all of the derived lock dependencies into one set~$ R $.
+This set is interpreted as a~relation, and its transitive closure~$ R^* $ is
+computed. If any lock depends on itself in the closure, \LLDD will find
+dependencies that have caused the deadlock. After that, it will report
+a~deadlock between the locks of these dependencies. More precisely,
+a~deadlock is represented in~$ R^* $ as lock dependency $ (L, L) $. Then,
+in the case of a~deadlock between two locks, \LLDD looks for lock
+$ L^\prime : (L, L^\prime) \in R^* \wedge (L^\prime, L) \in R^* $ and
+reports the dependencies.
+
+%=============================================================================
+\vspace*{-4mm}\section{Increasing Analysis Accuracy}\vspace*{-2mm}
 \label{sec:heuristics}
-%-----------------------------------------------------------------------------
+%=============================================================================
 
-\todo{\ldots}
+\LLDD further implements several heuristics intended to decrease the number
+of possible false alarms. In this section, we introduce two of them. The
+first heuristic uses the detection of \emph{double-locking}/\emph{unlocking}
+errors to indicate that the analysis is over-approximating too much, since
+these errors are quite rare. Instead of detecting such errors, \LLDD resets
+(some of) the working sets. A~user may, however, disable this heuristic using
+an input parameter of the analysis (we call this \mOne; \mTwo has this
+heuristic enabled).
 
-% L2D2 further implements several heuristics intended to decrease the number
-% of possible false alarms.
-% %
-% For instance, since double-locking/unlocking errors are quite rare, their
-% detection may instead be used as an indicator that the analysis is
-% over-approximating too much, and it may reset (some of) the working sets.
-% %
-% An example of another heuristic used in L2D2 is the detection of so-called
-% \emph{gate locks}, i.e., locks guarding other locks (upon which deadlocks on
-% the nested locks are not reported).
+Resetting of the working sets is done as follows. In the case of lock
+acquisition, we check whether it is a~double-locking. If this is the case,
+it is assumed that \LLDD considered some non-existent path, and
+\texttt{lockset} is no longer trustworthy. Therefore, it is erased, and the
+only lock left in it is the currently acquired one, as this is the only one
+about which we can safely say it is locked. It is implemented by adding
+the following statement to Algorithm~\ref{alg:lock}: $ \mathbf{if} \ L \in
+S.lockset \ \mathbf{then} \ S.lockset \gets \{L\}; $. When releasing
+a~lock, we check whether it was yet unlocked. In this case,
+\texttt{lockset} will be erased, eliminating any dependencies that
+the locking error would cause. We added the following statement to
+Algorithm~\ref{alg:unlock}: $ \mathbf{if} \ L \in S.unlockset \
+\mathbf{then} \ S.lockset \gets \emptyset; $. Finally, we check
+double-locking/unlocking when a~function call appears in the analysed code.
+We ask whether some lock that should be locked/unlocked in the callee is
+currently released/held, resp. If such a~lock is found, it is assumed that
+\LLDD used a~non-existent path to reach the function call, and therefore
+\texttt{lockset} is discarded, and as the new one \texttt{lockset} of the
+callee will be used. We implemented this by adding the following to
+Algorithm~\ref{alg:sum}: $ \mathbf{if} \ (S.lockset \cap \chi.unlocked \neq
+\emptyset) \vee (S.unlockset \cap \chi.locked \neq \emptyset) \
+\mathbf{then} \ S.lockset \gets \chi.lockset; $.
 
-%-----------------------------------------------------------------------------
-\section{Experimental Evaluation}
+The second heuristic used in \LLDD is the detection of so-called \emph{gate
+locks}~\cite{goodlock00}, i.e., locks guarding other locks (upon which
+deadlocks on the nested locks are not reported). Whenever we detect
+a~possible deadlock\,---\,represented by two reverse dependencies
+$ d_1 = (L, L^\prime) $ and $ d_2 = (L^\prime, L) $\,---\,we check whether
+the same gate lock protects them. In that case, we would not
+report a~deadlock. We check this by computing the intersection of
+\texttt{guards}, i.e., all locks locked before program points where
+dependencies~$ d_1 $ and~$ d_2 $ were captured. In particular, we not
+report a~deadlock for dependencies~$ d_1 $ and~$ d_2 $ if
+$ \text{\texttt{guards}}(d_1) \cap \text{\texttt{guards}}(d_2) \neq
+\emptyset $.
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+%=============================================================================
+\vspace*{-4mm}\section{Experimental Evaluation}\vspace*{-2mm}
 \label{sec:experiments}
-%-----------------------------------------------------------------------------
+%=============================================================================
 
-\todo{\ldots}
-\cite{kroening16}
+Within our experimental evaluation of \LLDD, we have applied it on a~set of
+1,002 C~programs with POSIX threads derived from a~Debian GNU/Linux
+distribution, originally prepared for evaluating the static deadlock analyser
+based on the \CProver framework proposed in~\cite{kroening16}.
+%
+The~benchmark consists of 11.4\,MLoC.
+%
+Eight of the programs contain a~known deadlock.
+%
+Like \CProver, \LLDD was able to detect all the deadlocks.
+%
+On the remaining 994 programs, it produced 11 false alarms (77 of the programs
+failed to compile since the \Infer's front-end does not support some of the
+constructions used).
+%
+We find this very encouraging, considering that the \CProver's deadlock
+detector produced 114 false alarms, 453 timeouts (w.r.t. our 30-minute time
+limit), and ran out of the available 24\,GB of memory in 135 cases.
+%
+Altogether, \LLDD consumed less than~1\,\% of the time taken by \CProver.
 
-% Within our experimental evaluation of L2D2, we have applied it on a~set of
-% 1,002 C~programs with POSIX threads derived from a~Debian GNU/Linux
-% distribution, originally prepared for evaluating the static deadlock analyser
-% based on the~CProver framework proposed in~\cite{kroening16}.
-% %
-% The~benchmark consists of 11.4\,MLoC.
-% %
-% Eight of the programs contain a~known deadlock.
-% %
-% Like CProver, L2D2 was able to detect all the deadlocks.
-% %
-% On the remaining 994 programs, it produced 39 false alarms (78 of the programs
-% failed to compile since the Infer's front-end does not support some of the
-% constructions used).
-% %
-% We find this very encouraging, considering that the CProver's deadlock
-% detector produced 114 false alarms, 453 timeouts (w.r.t. our 30-minute time
-% limit), and ran out of the available 24\,GB of memory in 135 cases.
-% %
-% Altogether, L2D2 consumed less than~1\,\% of the time taken by CProver.
+\begin{table}[t]
+    \begin{center}
+        \caption{Results of \LLDD and \CProver ran on \CProver Test-Suite}
+        \begin{tabular}{l|r|r|r}
+        & \textbf{proved} & alarms & failures \\ \hline
+        \textsc{\CProver}  & \textbf{292}   & 114   & 588 \\ 
+        \textsc{\LLDD}\textsubscript{\mOne} & \textbf{906} & 11 & 77 \\
+        \textsc{\LLDD}\textsubscript{\mTwo}  & \textbf{896} & 21 & 77
+        \end{tabular}
+    \end{center}
+    \vspace*{-4mm}
+\end{table}
 
-%-----------------------------------------------------------------------------
-\section{Conclusions and Future Work}
+\begin{table}[t]
+    \begin{center}
+    \caption{\eprosimaDDS, \sort, \grep, \memcached, \tgrep}
+    \begin{tabular}{l|r|r|r|r|r}
+                     & kLoC & \shortstack{ alarms \\ \mOne } & \shortstack{alarms \\ \mTwo} & \shortstack{real \\ deadlocks} & \shortstack{runtime \\ (mm:ss)} \\ \hline
+        \eprosimaDDS & 110 & 3 & 6 & 0 & 06:53 \\
+        \memcached   & 31 & 6 & 7 & 0 & 00:08 \\
+        \sort        & 7.2 & 0 & 0 & 0 & 00:02 \\
+        \grep        & 8.7 & 0 & 0 & 0 & 00:03 \\
+        \tgrep       & 2.4 & 0 & 0 & 0 & 00:01 \\
+
+        \CProver     & 10 945 & 23 & 80 & 8 & 83:23 \\
+    \end{tabular}
+    \end{center}
+    \label{tab:my_label}
+    \vspace*{-6mm}
+\end{table}
+
+We have performed several experiments with \LLDD. We used a benchmark consisting of 1,002 C-programs with POSIX threads derived from a Debian GNU/Linux distribution, originally prepared for evaluating the static deadlock analyser based on the~CProver framework proposed in~\cite{kroening16}.  The benchmark consists of eight programs that contain an introduced deadlock and 994 deadlock-free programs. All of the known deadlocks were detected by both \CProver and \LLDD, that was run in both modes. The results for the remaining 994 programs are shown in the figure below. While \CProver needed 300 hours to analyse these programs, \LLDD needed only 1 hour and 30 minutes, which proves the scalability of \Infer.
+
+We also ran \LLDD on other programs. \eprosimaDDS 2.6.1 is a Data Distribution Service of the Object Management Group written in C++. It uses \textsc{CMake} for the build, which is a supported build system by \Infer, therefore we run the analysis of the whole project. 211 files were analysed with a total number of about 110\,kLoC. There were only 3 deadlocks reported in \mOne and 6 deadlocks using \mTwo and the analysis took only about 7 minutes. So far, we have not been able to find out if any of these reports are real deadlocks or all false, but it should not be a problem for the developers of the source code to check the errors with such a small number of reported deadlocks.
+
+Next, we analysed \memcached version 1.6.10, a distributed memory object caching system. The source code of this program was preprocessed by \framac (https://frama-c.com) and the analysed source code has 31\,kLoC. \LLDD reported 6 deadlocks in \mOne and 7 deadlocks in \mTwo and the analysis took only 8 seconds. As with \eprosimaDDS we could not find out if at least some of these deadlocks are real or they are all false positives, but even in this case it should not be difficult for developers to verify these issues.
+
+The last 3 programs we analysed were \grep 3.7, \tgrep, a multithreaded version of find combined with \grep by Ron Winacott, and GNU Coreutils \sort 8.32. All of these programs are written in C and have also been preprocessed by the \framac tool. No deadlock was reported in any of these programs, both in \mOne and \mTwo .
+
+% memcached version 1.6.10 (https://memcached.org/)
+% grep version 3.7 (https://www.gnu.org/software/grep/manual/grep.html)
+% tgrep version 1? (https://shrubbery.net/solaris9ab/SUNWdev/MTP/p56.html)
+% sort version 8.32 (https://www.gnu.org/software/coreutils/manual/html_node/sort-invocation.html#sort-invocation)
+
+mode1:
+LoC/alarms = 11104300/24 = 462679
+alarms/LoC = 24/11104300 = 2,1613
+
+mode2:
+LoC/alarms = 11104300/85 = 130639
+alarms/LoC = 85/11104300 = 7,6547
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+%=============================================================================
+\vspace*{-4mm}\section{Conclusions and Future Work}\vspace*{-2mm}
 \label{sec:con}
-%-----------------------------------------------------------------------------
+%=============================================================================
 
-\todo{\ldots}
+\rem{Maybe omit this section if not enough space.}
 
-%-----------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Bibliography
-%-----------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\vspace*{-4mm}
+\renewcommand\refname{References\vspace*{-2mm}}
 \bibliographystyle{abbrv}
 \bibliography{bibliography}
 
-%-----------------------------------------------------------------------------
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+\enlargethispage{4mm}
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
-%-----------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
