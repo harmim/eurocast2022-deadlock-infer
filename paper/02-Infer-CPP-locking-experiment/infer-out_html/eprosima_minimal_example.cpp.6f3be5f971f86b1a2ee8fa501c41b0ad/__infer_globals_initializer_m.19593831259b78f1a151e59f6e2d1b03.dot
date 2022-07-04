@@ -1,0 +1,14 @@
+/* @generated */
+digraph cfg {
+"__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_1" [label="1: Start __infer_globals_initializer_m\nFormals: \nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_1" -> "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_3" ;
+"__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_2" [label="2: Exit __infer_globals_initializer_m \n  " color=yellow style=filled]
+	
+
+"__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_3" [label="3:  DeclStmt \n   VARIABLE_DECLARED(#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|!pod>$m:posix_mutex); [line 39, column 1]\n  n$0=_fun_posix_mutex::posix_mutex(&#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|!pod>$m:posix_mutex*) [line 39, column 13]\n  EXIT_SCOPE(n$0); [line 39, column 13]\n  APPLY_ABSTRACTION; [line 39, column 13]\n " shape="box"]
+	
+
+	 "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_3" -> "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_2" ;
+}

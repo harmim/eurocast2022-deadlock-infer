@@ -1,0 +1,47 @@
+/* @generated */
+digraph cfg {
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_1" [label="1: Start run\nFormals: \nLocals:  i:int lock:std::unique_lock<posix_mutex> 0$?%__sil_tmp__temp_construct_n$9:std::defer_lock_t \n  " color=yellow style=filled]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_1" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_11" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_2" [label="2: Exit run \n   NULLIFY(&lock); [line 49, column 1]\n  NULLIFY(&0$?%__sil_tmp__temp_construct_n$9); [line 49, column 1]\n " color=yellow style=filled]
+	
+
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_3" [label="3:  Destruction(Scope) \n   _=*&lock:std::unique_lock<posix_mutex> [line 49, column 1]\n  n$1=_fun_std::unique_lock<posix_mutex>::~unique_lock(&lock:std::unique_lock<posix_mutex>*) injected [line 49, column 1]\n  EXIT_SCOPE(_,n$1,lock); [line 49, column 1]\n  APPLY_ABSTRACTION; [line 49, column 1]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_3" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_2" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" [label="4: + \n  " ]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" [label="5:  BinaryOperatorStmt: LT \n   n$3=*&i:int [line 44, column 10]\n  *&i:int=(n$3 + 1) [line 44, column 10]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_6" ;
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_7" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_6" [label="6: Prune (true branch, while) \n   PRUNE((n$3 < 10), true); [line 44, column 10]\n  EXIT_SCOPE(n$3); [line 44, column 10]\n " shape="invhouse"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_6" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_9" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_7" [label="7: Prune (false branch, while) \n   PRUNE(!(n$3 < 10), false); [line 44, column 10]\n  NULLIFY(&i); [line 44, column 10]\n  EXIT_SCOPE(n$3,i); [line 44, column 10]\n " shape="invhouse"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_7" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_3" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_8" [label="8:  Call _fun_std::unique_lock<posix_mutex>::unlock \n   _=*&lock:std::unique_lock<posix_mutex> [line 47, column 5]\n  n$5=_fun_std::unique_lock<posix_mutex>::unlock(&lock:std::unique_lock<posix_mutex>&) [line 47, column 5]\n  EXIT_SCOPE(_,n$5); [line 47, column 5]\n  APPLY_ABSTRACTION; [line 47, column 5]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_8" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_9" [label="9:  Call _fun_std::unique_lock<posix_mutex>::lock \n   _=*&lock:std::unique_lock<posix_mutex> [line 45, column 5]\n  n$7=_fun_std::unique_lock<posix_mutex>::lock(&lock:std::unique_lock<posix_mutex>&) [line 45, column 5]\n  EXIT_SCOPE(_,n$7); [line 45, column 5]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_9" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_8" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_10" [label="10:  DeclStmt \n   VARIABLE_DECLARED(i:int); [line 43, column 3]\n  *&i:int=0 [line 43, column 3]\n  APPLY_ABSTRACTION; [line 43, column 3]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_10" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_11" [label="11:  DeclStmt \n   VARIABLE_DECLARED(lock:std::unique_lock<posix_mutex>); [line 42, column 3]\n  n$10=_fun_std::defer_lock_t::defer_lock_t(&0$?%__sil_tmp__temp_construct_n$9:std::defer_lock_t*,&#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|const|!pod>$std::defer_lock:std::defer_lock_t const &) copy ctor [line 42, column 41]\n  n$11=_fun_std::unique_lock<posix_mutex>::unique_lock(&lock:std::unique_lock<posix_mutex>*,&#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|!pod>$m:posix_mutex&,&0$?%__sil_tmp__temp_construct_n$9:std::defer_lock_t) [line 42, column 33]\n  EXIT_SCOPE(n$10,n$11,0$?%__sil_tmp__temp_construct_n$9); [line 42, column 33]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_11" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_10" ;
+}
