@@ -1,0 +1,132 @@
+/* @generated */
+digraph cfg {
+"__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_1" [label="1: Start __infer_globals_initializer_m\nFormals: \nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_1" -> "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_3" ;
+"__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_2" [label="2: Exit __infer_globals_initializer_m \n  " color=yellow style=filled]
+	
+
+"__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_3" [label="3:  DeclStmt \n   VARIABLE_DECLARED(#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|!pod>$m:posix_mutex); [line 39, column 1]\n  n$0=_fun_posix_mutex::posix_mutex(&#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|!pod>$m:posix_mutex*) [line 39, column 13]\n " shape="box"]
+	
+
+	 "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_3" -> "__infer_globals_initializer_m.19593831259b78f1a151e59f6e2d1b03_2" ;
+"main.fad58de7366495db4650cfefac2fcd61_1" [label="1: Start main\nFormals: \nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "main.fad58de7366495db4650cfefac2fcd61_1" -> "main.fad58de7366495db4650cfefac2fcd61_3" ;
+"main.fad58de7366495db4650cfefac2fcd61_2" [label="2: Exit main \n  " color=yellow style=filled]
+	
+
+"main.fad58de7366495db4650cfefac2fcd61_3" [label="3:  Call _fun_run \n   n$0=_fun_run() [line 52, column 3]\n " shape="box"]
+	
+
+	 "main.fad58de7366495db4650cfefac2fcd61_3" -> "main.fad58de7366495db4650cfefac2fcd61_2" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_1" [label="1: Start run\nFormals: \nLocals:  i:int lock:std::unique_lock<posix_mutex> 0$?%__sil_tmp__temp_construct_n$9:std::defer_lock_t \n  " color=yellow style=filled]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_1" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_11" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_2" [label="2: Exit run \n  " color=yellow style=filled]
+	
+
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_3" [label="3:  Destruction(Scope) \n   _=*&lock:std::unique_lock<posix_mutex> [line 49, column 1]\n  n$1=_fun_std::unique_lock<posix_mutex>::~unique_lock(&lock:std::unique_lock<posix_mutex>*) injected [line 49, column 1]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_3" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_2" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" [label="4: + \n  " ]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" [label="5:  BinaryOperatorStmt: LT \n   n$3=*&i:int [line 44, column 10]\n  *&i:int=(n$3 + 1) [line 44, column 10]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_6" ;
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_5" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_7" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_6" [label="6: Prune (true branch, while) \n   PRUNE((n$3 < 10), true); [line 44, column 10]\n " shape="invhouse"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_6" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_9" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_7" [label="7: Prune (false branch, while) \n   PRUNE(!(n$3 < 10), false); [line 44, column 10]\n " shape="invhouse"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_7" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_3" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_8" [label="8:  Call _fun_std::unique_lock<posix_mutex>::unlock \n   _=*&lock:std::unique_lock<posix_mutex> [line 47, column 5]\n  n$5=_fun_std::unique_lock<posix_mutex>::unlock(&lock:std::unique_lock<posix_mutex>&) [line 47, column 5]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_8" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_9" [label="9:  Call _fun_std::unique_lock<posix_mutex>::lock \n   _=*&lock:std::unique_lock<posix_mutex> [line 45, column 5]\n  n$7=_fun_std::unique_lock<posix_mutex>::lock(&lock:std::unique_lock<posix_mutex>&) [line 45, column 5]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_9" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_8" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_10" [label="10:  DeclStmt \n   VARIABLE_DECLARED(i:int); [line 43, column 3]\n  *&i:int=0 [line 43, column 3]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_10" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_4" ;
+"run#7318987756397183324.4762c13b17a3b70e11002f366905444f_11" [label="11:  DeclStmt \n   VARIABLE_DECLARED(lock:std::unique_lock<posix_mutex>); [line 42, column 3]\n  n$10=_fun_std::defer_lock_t::defer_lock_t(&0$?%__sil_tmp__temp_construct_n$9:std::defer_lock_t*,&#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|const|!pod>$std::defer_lock:std::defer_lock_t const &) copy ctor [line 42, column 41]\n  n$11=_fun_std::unique_lock<posix_mutex>::unique_lock(&lock:std::unique_lock<posix_mutex>*,&#GB<experiments/eprosima_minimal_example/eprosima_minimal_example.cpp|!pod>$m:posix_mutex&,&0$?%__sil_tmp__temp_construct_n$9:std::defer_lock_t) [line 42, column 33]\n " shape="box"]
+	
+
+	 "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_11" -> "run#7318987756397183324.4762c13b17a3b70e11002f366905444f_10" ;
+"unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_1" [label="1: Start posix_mutex::unlock\nFormals:  this:posix_mutex*\nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_1" -> "unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_3" ;
+"unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_2" [label="2: Exit posix_mutex::unlock \n  " color=yellow style=filled]
+	
+
+"unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_3" [label="3:  Call _fun_pthread_mutex_unlock \n   n$0=*&this:posix_mutex* [line 35, column 25]\n  n$1=_fun_pthread_mutex_unlock(n$0.m_mut:pthread_mutex_t*) [line 35, column 3]\n " shape="box"]
+	
+
+	 "unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_3" -> "unlock#posix_mutex#(12344160362238583440).45f118dbdb20d54c5d7c26963fcd3520_2" ;
+"lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_1" [label="1: Start posix_mutex::lock\nFormals:  this:posix_mutex*\nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_1" -> "lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_3" ;
+"lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_2" [label="2: Exit posix_mutex::lock \n  " color=yellow style=filled]
+	
+
+"lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_3" [label="3:  Call _fun_printf \n   n$0=_fun_printf(\"posix_mutex::lock() function\\n\":char const *) [line 31, column 3]\n " shape="box"]
+	
+
+	 "lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_3" -> "lock#posix_mutex#(7580667834731424857).5fb8cef1f689fd6eba25a918d7f98afd_2" ;
+"posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_1" [label="1: Start posix_mutex::posix_mutex\nFormals:  this:posix_mutex*\nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_1" -> "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_4" ;
+"posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_2" [label="2: Exit posix_mutex::posix_mutex \n  " color=yellow style=filled]
+	
+
+"posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_3" [label="3:  Call _fun_pthread_mutex_init \n   n$0=*&this:posix_mutex* [line 22, column 23]\n  n$1=_fun_pthread_mutex_init(n$0.m_mut:pthread_mutex_t*,null:pthread_mutexattr_t const *) [line 22, column 3]\n " shape="box"]
+	
+
+	 "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_3" -> "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_2" ;
+"posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_4" [label="4:  Constructor Init \n   n$2=*&this:posix_mutex* [line 21, column 21]\n " shape="box"]
+	
+
+	 "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_4" -> "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_5" ;
+"posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_5" [label="5:  Constructor Init \n   n$3=_fun_pthread_mutex_t::(n$2.m_mut:pthread_mutex_t*) [line 21, column 21]\n " shape="box"]
+	
+
+	 "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_5" -> "posix_mutex#posix_mutex#{1045546613265935213}.b978921b66d999358bcb9e1020074d4b_3" ;
+"__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_1" [label="1: Start posix_mutex::__infer_inner_destructor_~posix_mutex\nFormals:  this:posix_mutex*\nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_1" -> "__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_3" ;
+"__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_2" [label="2: Exit posix_mutex::__infer_inner_destructor_~posix_mutex \n  " color=yellow style=filled]
+	
+
+"__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_3" [label="3:  Call _fun_pthread_mutex_destroy \n   n$2=*&this:posix_mutex* [line 26, column 26]\n  n$3=_fun_pthread_mutex_destroy(n$2.m_mut:pthread_mutex_t*) [line 26, column 3]\n " shape="box"]
+	
+
+	 "__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_3" -> "__infer_inner_destructor_~posix_mutex#posix_mutex#(4897540711018572786).ba1ad0f2baa56ba29d9f36e34a84bc09_2" ;
+"~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_1" [label="1: Start posix_mutex::~posix_mutex\nFormals:  this:posix_mutex*\nLocals:  \n  " color=yellow style=filled]
+	
+
+	 "~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_1" -> "~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_3" ;
+"~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_2" [label="2: Exit posix_mutex::~posix_mutex \n  " color=yellow style=filled]
+	
+
+"~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_3" [label="3:  Destruction(virtual base) \n   n$0=*&this:posix_mutex* [line 27, column 1]\n  _=*n$0:posix_mutex [line 27, column 1]\n  n$2=_fun_posix_mutex::__infer_inner_destructor_~posix_mutex(n$0:posix_mutex*) injected [line 27, column 1]\n " shape="box"]
+	
+
+	 "~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_3" -> "~posix_mutex#posix_mutex#(4897540711018572786).b81e1d76667f1f6c18b2c6d4477f02a7_2" ;
+}
